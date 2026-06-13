@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Survey App | Built by Wambue Leon</title>
+  <style>
+    /* ===== RESET & BASE ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --accent: #58a6ff;
+      --accent2: #3fb950;
+      --danger: #f85149;
+      --warn: #d29922;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --radius: 10px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ===== NAV ===== */
+    nav {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-brand { font-size: 1.2rem; font-weight: 700; color: var(--accent); letter-spacing: 1px; }
+    .nav-brand span { color: var(--text); }
+    .nav-right { display: flex; gap: 10px; align-items: center; }
+    .nav-user { color: var(--muted); font-size: 0.85rem; }
+
+    /* ===== BUTTONS ===== */
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: var(--radius);
+      padding: 8px 18px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: opacity 0.15s;
+    }
+    button:hover { opacity: 0.85; }
+    .btn-primary { background: var(--accent); color: #0d1117; }
+    .btn-success { background: var(--accent2); color: #0d1117; }
+    .btn-danger  { background: var(--danger);  color: #fff; }
+    .btn-warn    { background: var(--warn);    color: #0d1117; }
+    .btn-ghost   { background: transparent; border: 1px solid var(--border); color: var(--text); }
+
+    /* ===== LAYOUT ===== */
+    .container { max-width: 860px; margin: 0 auto; padding: 32px 20px; }
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* ===== CARDS ===== */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+    .card h3 { margin-bottom: 6px; font-size: 1.05rem; }
+    .card p  { color: var(--muted); font-size: 0.88rem; margin-bottom: 12px; }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-left: 8px;
+    }
+    .badge-open   { background: #1a3a1a; color: var(--accent2); }
+    .badge-closed { background: #2a1a1a; color: var(--danger);  }
+    .badge-draft  { background: #2a2a1a; color: var(--warn);    }
+
+    /* ===== FORMS ===== */
+    .form-group { margin-bottom: 18px; }
+    label { display: block; margin-bottom: 6px; color: var(--muted); font-size: 0.88rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    input[type="text"], input[type="password"], input[type="number"] {
+      width: 100%; padding: 10px 14px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 0.95rem;
+    }
+    input:focus { outline: none; border-color: var(--accent); }
+
+    /* ===== QUESTIONS ===== */
+    .question-block {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .question-block .q-header {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+    }
+    .question-block .q-header input { flex: 1; }
+    .choice-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+    .choice-row input { flex: 1; }
+    .choice-row button { padding: 5px 10px; font-size: 0.8rem; }
+
+    /* ===== SURVEY TAKE ===== */
+    .survey-question { margin-bottom: 22px; }
+    .survey-question h4 { margin-bottom: 10px; color: var(--text); }
+    .option-label {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 6px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .option-label:hover { border-color: var(--accent); background: #1a2233; }
+    .option-label input[type="radio"] { accent-color: var(--accent); width: 16px; height: 16px; }
+
+    /* ===== RESULTS ===== */
+    .results-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 0.9rem; }
+    .results-table th, .results-table td {
+      padding: 10px 14px; text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .results-table th { color: var(--muted); font-weight: 600; }
+
+    .bar-wrap { margin-top: 8px; }
+    .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; font-size: 0.85rem; }
+    .bar-label { width: 160px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; }
+    .bar-track { flex: 1; background: var(--border); border-radius: 4px; height: 14px; overflow: hidden; }
+    .bar-fill   { height: 100%; background: var(--accent); border-radius: 4px; transition: width 0.4s; }
+    .bar-count  { width: 30px; text-align: right; color: var(--muted); }
+
+    /* ===== LOGIN ===== */
+    .login-wrap {
+      max-width: 380px; margin: 80px auto;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 32px;
+    }
+    .login-wrap h2 { margin-bottom: 22px; color: var(--accent); }
+
+    /* ===== HERO ===== */
+    .hero {
+      text-align: center; padding: 48px 20px 32px;
+    }
+    .hero h1 { font-size: 2rem; margin-bottom: 8px; }
+    .hero p  { color: var(--muted); margin-bottom: 24px; }
+
+    /* ===== TABS ===== */
+    .tabs { display: flex; gap: 4px; margin-bottom: 24px; border-bottom: 1px solid var(--border); }
+    .tab-btn {
+      padding: 10px 20px; background: transparent;
+      border: none; border-bottom: 2px solid transparent;
+      border-radius: 0; color: var(--muted); font-weight: 600;
+    }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    /* ===== ALERTS ===== */
+    .alert {
+      padding: 12px 16px; border-radius: 8px; margin-bottom: 16px;
+      font-size: 0.9rem; display: none;
+    }
+    .alert.show { display: block; }
+    .alert-error   { background: #2a1a1a; border: 1px solid var(--danger); color: var(--danger); }
+    .alert-success { background: #1a2a1a; border: 1px solid var(--accent2); color: var(--accent2); }
+
+    /* ===== FOOTER ===== */
+    footer {
+      text-align: center; padding: 32px 16px;
+      color: var(--muted); font-size: 0.82rem;
+      border-top: 1px solid var(--border); margin-top: 48px;
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+
+    /* ===== MISC ===== */
+    .flex-between { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+    .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+    .section-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 18px; }
+    .empty { text-align: center; color: var(--muted); padding: 40px 0; }
+    hr { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+  </style>
+</head>
+<body>
+
+<!-- ========== NAV ========== -->
+<nav>
+  <div class="nav-brand">SURVEY<span>APP</span></div>
+  <div class="nav-right">
+    <span class="nav-user" id="navUser"></span>
+    <button class="btn-ghost" id="btnLogin"  onclick="showLogin()">Coordinator Login</button>
+    <button class="btn-danger" id="btnLogout" style="display:none" onclick="doLogout()">Logout</button>
+  </div>
+</nav>
+
+<!-- ========== HOME PAGE ========== -->
+<div class="page active" id="pageHome">
+  <div class="container">
+    <div class="hero">
+      <h1>Survey <span style="color:var(--accent)">App</span></h1>
+      <p>Create, conduct, and analyze surveys. Built by <strong>Wambue Leon</strong> · <a href="https://github.com/lnwleon" target="_blank">@lnwleon</a></p>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('open')">📋 Open Surveys</button>
+      <button class="tab-btn" onclick="switchTab('closed')">📊 Results</button>
+      <button class="tab-btn" id="tabAdmin" style="display:none" onclick="switchTab('admin')">⚙️ Admin</button>
+    </div>
+
+    <!-- OPEN SURVEYS TAB -->
+    <div id="tabOpen">
+      <div class="section-title">Open Surveys</div>
+      <div id="openSurveysList"></div>
+    </div>
+
+    <!-- CLOSED/RESULTS TAB -->
+    <div id="tabClosed" style="display:none">
+      <div class="section-title">Survey Results</div>
+      <div id="closedSurveysList"></div>
+    </div>
+
+    <!-- ADMIN TAB -->
+    <div id="tabAdminPanel" style="display:none">
+      <div class="flex-between" style="margin-bottom:20px">
+        <div class="section-title" style="margin-bottom:0">Manage Surveys</div>
+        <button class="btn-primary" onclick="showCreateSurvey()">+ New Survey</button>
+      </div>
+      <div id="adminSurveysList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== LOGIN PAGE ========== -->
+<div class="page" id="pageLogin">
+  <div class="login-wrap">
+    <h2>Coordinator Login</h2>
+    <div class="alert alert-error" id="loginError">Invalid credentials. Try again.</div>
+    <div class="form-group">
+      <label>Username</label>
+      <input type="text" id="loginUser" placeholder="coordinator" />
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="loginPass" placeholder="••••••••" />
+    </div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="doLogin()">Login</button>
+      <button class="btn-ghost" onclick="showPage('pageHome')">Cancel</button>
+    </div>
+    <p style="color:var(--muted);font-size:0.8rem;margin-top:16px">Demo: username <strong>admin</strong> / password <strong>admin123</strong></p>
+  </div>
+</div>
+
+<!-- ========== CREATE / EDIT SURVEY PAGE ========== -->
+<div class="page" id="pageCreate">
+  <div class="container">
+    <div class="section-title">Create Survey</div>
+    <div class="alert alert-error" id="createError"></div>
+    <div class="card">
+      <div class="form-group">
+        <label>Survey Title</label>
+        <input type="text" id="surveyTitle" placeholder="e.g. Customer Satisfaction Survey" />
+      </div>
+      <div id="questionsContainer"></div>
+      <div class="btn-row">
+        <button class="btn-ghost" onclick="addQuestion()">+ Add Question</button>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-success" onclick="saveSurvey()">💾 Save Survey</button>
+      <button class="btn-ghost" onclick="showPage('pageHome')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== TAKE SURVEY PAGE ========== -->
+<div class="page" id="pageTake">
+  <div class="container">
+    <div id="takeSurveyContent"></div>
+  </div>
+</div>
+
+<!-- ========== VIEW RESULTS PAGE ========== -->
+<div class="page" id="pageResults">
+  <div class="container">
+    <div id="resultsContent"></div>
+  </div>
+</div>
+
+<!-- ========== FOOTER ========== -->
+<footer>
+  Built by <a href="https://github.com/lnwleon" target="_blank">Wambue Leon</a> &mdash;
+  Nairobi, Kenya &mdash; 2025 &mdash;
+  <a href="https://github.com/florinpop17/app-ideas/blob/master/Projects/3-Advanced/Survey-App.md" target="_blank">App Idea Source</a>
+</footer>
+
+<script>
+// ============================================================
+// STATE
+// ============================================================
+let state = {
+  isAdmin: false,
+  currentTab: 'open',
+  editingSurveyId: null,
+  surveys: JSON.parse(localStorage.getItem('wl_surveys') || '[]'),
+};
+
+// ============================================================
+// PERSISTENCE
+// ============================================================
+function save() {
+  localStorage.setItem('wl_surveys', JSON.stringify(state.surveys));
+}
+
+// ============================================================
+// PAGE ROUTING
+// ============================================================
+function showPage(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+}
+
+function showLogin() { showPage('pageLogin'); }
+
+function showHome() {
+  renderHome();
+  showPage('pageHome');
+}
+
+// ============================================================
+// AUTH
+// ============================================================
+const ADMIN_CREDS = { user: 'admin', pass: 'admin123' };
+
+function doLogin() {
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  if (u === ADMIN_CREDS.user && p === ADMIN_CREDS.pass) {
+    state.isAdmin = true;
+    document.getElementById('navUser').textContent = '👤 Coordinator';
+    document.getElementById('btnLogin').style.display = 'none';
+    document.getElementById('btnLogout').style.display = '';
+    document.getElementById('tabAdmin').style.display = '';
+    document.getElementById('loginError').classList.remove('show');
+    showHome();
+  } else {
+    document.getElementById('loginError').classList.add('show');
+  }
+}
+
+function doLogout() {
+  state.isAdmin = false;
+  document.getElementById('navUser').textContent = '';
+  document.getElementById('btnLogin').style.display = '';
+  document.getElementById('btnLogout').style.display = 'none';
+  document.getElementById('tabAdmin').style.display = 'none';
+  showHome();
+  switchTab('open');
+}
+
+// ============================================================
+// TABS
+// ============================================================
+function switchTab(tab) {
+  state.currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  const idx = ['open','closed','admin'].indexOf(tab);
+  document.querySelectorAll('.tab-btn')[idx]?.classList.add('active');
+  document.getElementById('tabOpen').style.display       = tab === 'open'   ? '' : 'none';
+  document.getElementById('tabClosed').style.display     = tab === 'closed' ? '' : 'none';
+  document.getElementById('tabAdminPanel').style.display = tab === 'admin'  ? '' : 'none';
+  renderHome();
+}
+
+// ============================================================
+// HOME RENDER
+// ============================================================
+function renderHome() {
+  renderOpenSurveys();
+  renderClosedSurveys();
+  if (state.isAdmin) renderAdminSurveys();
+}
+
+function renderOpenSurveys() {
+  const el = document.getElementById('openSurveysList');
+  const open = state.surveys.filter(s => s.status === 'open');
+  if (!open.length) { el.innerHTML = '<div class="empty">No open surveys right now.</div>'; return; }
+  el.innerHTML = open.map(s => `
+    <div class="card">
+      <div class="flex-between">
+        <div>
+          <h3>${esc(s.title)}<span class="badge badge-open">OPEN</span></h3>
+          <p>${s.questions.length} question(s)</p>
+        </div>
+        <button class="btn-primary" onclick="startTake('${s.id}')">Take Survey</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderClosedSurveys() {
+  const el = document.getElementById('closedSurveysList');
+  const closed = state.surveys.filter(s => s.status === 'closed');
+  if (!closed.length) { el.innerHTML = '<div class="empty">No closed surveys yet.</div>'; return; }
+  el.innerHTML = closed.map(s => `
+    <div class="card">
+      <div class="flex-between">
+        <div>
+          <h3>${esc(s.title)}<span class="badge badge-closed">CLOSED</span></h3>
+          <p>${s.responses.length} response(s)</p>
+        </div>
+        <button class="btn-ghost" onclick="viewResults('${s.id}')">View Results</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderAdminSurveys() {
+  const el = document.getElementById('adminSurveysList');
+  if (!state.surveys.length) { el.innerHTML = '<div class="empty">No surveys yet. Create one!</div>'; return; }
+  el.innerHTML = state.surveys.map(s => `
+    <div class="card">
+      <div class="flex-between">
+        <div>
+          <h3>${esc(s.title)}<span class="badge badge-${s.status}">${s.status.toUpperCase()}</span></h3>
+          <p>${s.questions.length} question(s) · ${s.responses.length} response(s)</p>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          ${s.status === 'draft'  ? `<button class="btn-success" onclick="openSurvey('${s.id}')">▶ Open</button>` : ''}
+          ${s.status === 'open'   ? `<button class="btn-warn"    onclick="closeSurvey('${s.id}')">■ Close</button>` : ''}
+          ${s.status === 'closed' ? `<button class="btn-ghost"   onclick="viewResults('${s.id}')">📊 Results</button>` : ''}
+          ${s.status === 'draft'  ? `<button class="btn-ghost"   onclick="editSurvey('${s.id}')">✏️ Edit</button>` : ''}
+          <button class="btn-danger" onclick="deleteSurvey('${s.id}')">🗑</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ============================================================
+// CREATE / EDIT SURVEY
+// ============================================================
+function showCreateSurvey(id = null) {
+  state.editingSurveyId = id;
+  const existing = id ? state.surveys.find(s => s.id === id) : null;
+
+  document.getElementById('createError').classList.remove('show');
+  document.getElementById('surveyTitle').value = existing ? existing.title : '';
+  document.getElementById('questionsContainer').innerHTML = '';
+
+  if (existing) {
+    existing.questions.forEach(q => addQuestion(q));
+  } else {
+    addQuestion();
+  }
+  showPage('pageCreate');
+}
+
+function editSurvey(id) { showCreateSurvey(id); }
+
+let qCount = 0;
+function addQuestion(existing = null) {
+  const qId = ++qCount;
+  const curCount = document.querySelectorAll('.question-block').length;
+  if (curCount >= 10) { alert('Maximum 10 questions allowed.'); return; }
+
+  const qTitle = existing ? esc(existing.text) : '';
+  const choices = existing ? existing.choices : ['', ''];
+
+  const div = document.createElement('div');
+  div.className = 'question-block';
+  div.dataset.qid = qId;
+  div.innerHTML = `
+    <div class="q-header">
+      <span style="color:var(--muted);font-weight:700;white-space:nowrap">Q${curCount + 1}</span>
+      <input type="text" placeholder="Question text..." value="${qTitle}" class="q-text" />
+      <button class="btn-danger" style="padding:5px 10px" onclick="removeQuestion(this)">✕</button>
+    </div>
+    <div class="choices-list">
+      ${choices.map((c,i) => choiceHTML(i, c)).join('')}
+    </div>
+    <button class="btn-ghost" style="font-size:0.8rem;padding:5px 12px;margin-top:6px" onclick="addChoice(this)">+ Choice</button>
+  `;
+  document.getElementById('questionsContainer').appendChild(div);
+}
+
+function choiceHTML(i, val = '') {
+  return `
+    <div class="choice-row">
+      <input type="text" placeholder="Choice ${i+1}" value="${esc(val)}" class="c-text" />
+      <button class="btn-danger" onclick="removeChoice(this)">✕</button>
+    </div>`;
+}
+
+function addChoice(btn) {
+  const list = btn.previousElementSibling;
+  if (list.children.length >= 5) { alert('Max 5 choices per question.'); return; }
+  list.insertAdjacentHTML('beforeend', choiceHTML(list.children.length));
+}
+
+function removeChoice(btn) {
+  const list = btn.closest('.choices-list');
+  if (list.children.length <= 1) { alert('Need at least 1 choice.'); return; }
+  btn.closest('.choice-row').remove();
+}
+
+function removeQuestion(btn) {
+  if (document.querySelectorAll('.question-block').length <= 1) { alert('Need at least 1 question.'); return; }
+  btn.closest('.question-block').remove();
+  renumberQuestions();
+}
+
+function renumberQuestions() {
+  document.querySelectorAll('.question-block').forEach((b, i) => {
+    b.querySelector('.q-header span').textContent = `Q${i + 1}`;
+  });
+}
+
+function saveSurvey() {
+  const errEl = document.getElementById('createError');
+  errEl.classList.remove('show');
+
+  const title = document.getElementById('surveyTitle').value.trim();
+  if (!title) { errEl.textContent = 'Please enter a survey title.'; errEl.classList.add('show'); return; }
+
+  const questions = [];
+  let valid = true;
+  document.querySelectorAll('.question-block').forEach((block, qi) => {
+    const qText = block.querySelector('.q-text').value.trim();
+    if (!qText) { errEl.textContent = `Question ${qi+1} is empty.`; errEl.classList.add('show'); valid = false; return; }
+    const choices = [];
+    block.querySelectorAll('.c-text').forEach(inp => {
+      const v = inp.value.trim();
+      if (v) choices.push(v);
+    });
+    if (choices.length < 2) { errEl.textContent = `Question ${qi+1} needs at least 2 choices.`; errEl.classList.add('show'); valid = false; return; }
+    questions.push({ text: qText, choices });
+  });
+  if (!valid) return;
+  if (!questions.length) { errEl.textContent = 'Add at least 1 question.'; errEl.classList.add('show'); return; }
+
+  if (state.editingSurveyId) {
+    const s = state.surveys.find(x => x.id === state.editingSurveyId);
+    s.title = title;
+    s.questions = questions;
+  } else {
+    state.surveys.push({
+      id: 'sv_' + Date.now(),
+      title,
+      questions,
+      status: 'draft',
+      responses: [],
+      createdAt: new Date().toISOString(),
+    });
+  }
+  save();
+  showHome();
+  switchTab('admin');
+}
+
+function openSurvey(id) {
+  const s = state.surveys.find(x => x.id === id);
+  s.status = 'open';
+  save(); renderHome();
+}
+
+function closeSurvey(id) {
+  const s = state.surveys.find(x => x.id === id);
+  s.status = 'closed';
+  save(); renderHome();
+}
+
+function deleteSurvey(id) {
+  if (!confirm('Delete this survey?')) return;
+  state.surveys = state.surveys.filter(x => x.id !== id);
+  save(); renderHome();
+}
+
+// ============================================================
+// TAKE SURVEY
+// ============================================================
+function startTake(id) {
+  const s = state.surveys.find(x => x.id === id);
+  const el = document.getElementById('takeSurveyContent');
+  el.innerHTML = `
+    <div class="section-title">${esc(s.title)}</div>
+    <div class="alert alert-error" id="takeError"></div>
+    <form id="surveyForm">
+      ${s.questions.map((q, qi) => `
+        <div class="survey-question card">
+          <h4>Q${qi+1}. ${esc(q.text)}</h4>
+          ${q.choices.map((c, ci) => `
+            <label class="option-label">
+              <input type="radio" name="q${qi}" value="${ci}" required />
+              ${esc(c)}
+            </label>
+          `).join('')}
+        </div>
+      `).join('')}
+    </form>
+    <div class="btn-row">
+      <button class="btn-success" onclick="submitSurvey('${s.id}')">✅ Submit</button>
+      <button class="btn-ghost" onclick="showHome()">Cancel</button>
+    </div>
+  `;
+  showPage('pageTake');
+}
+
+function submitSurvey(id) {
+  const s = state.surveys.find(x => x.id === id);
+  const errEl = document.getElementById('takeError');
+  errEl.classList.remove('show');
+
+  const answers = [];
+  let allAnswered = true;
+  s.questions.forEach((q, qi) => {
+    const checked = document.querySelector(`input[name="q${qi}"]:checked`);
+    if (!checked) { allAnswered = false; return; }
+    answers.push(parseInt(checked.value));
+  });
+
+  if (!allAnswered) {
+    errEl.textContent = 'Please answer all questions before submitting.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  s.responses.push({ answers, at: new Date().toISOString() });
+  save();
+
+  // Thank you screen
+  document.getElementById('takeSurveyContent').innerHTML = `
+    <div class="card" style="text-align:center;padding:48px">
+      <div style="font-size:3rem">🎉</div>
+      <h2 style="margin:16px 0 8px">Thank you!</h2>
+      <p style="color:var(--muted)">Your response has been recorded.</p>
+      <div class="btn-row" style="justify-content:center;margin-top:24px">
+        <button class="btn-primary" onclick="showHome()">Back to Home</button>
+      </div>
+    </div>
+  `;
+}
+
+// ============================================================
+// VIEW RESULTS
+// ============================================================
+function viewResults(id) {
+  const s = state.surveys.find(x => x.id === id);
+  const el = document.getElementById('resultsContent');
+
+  // Tally
+  const tallies = s.questions.map(q => new Array(q.choices.length).fill(0));
+  s.responses.forEach(r => {
+    r.answers.forEach((ans, qi) => { tallies[qi][ans]++; });
+  });
+  const total = s.responses.length;
+
+  el.innerHTML = `
+    <div class="flex-between" style="margin-bottom:20px">
+      <div>
+        <div class="section-title" style="margin-bottom:4px">${esc(s.title)}</div>
+        <span style="color:var(--muted);font-size:0.88rem">${total} response(s)</span>
+      </div>
+      <button class="btn-ghost" onclick="showHome()">← Back</button>
+    </div>
+    ${s.questions.map((q, qi) => `
+      <div class="card">
+        <h3>Q${qi+1}. ${esc(q.text)}</h3>
+        <table class="results-table">
+          <thead><tr><th>Choice</th><th>Votes</th><th>%</th></tr></thead>
+          <tbody>
+            ${q.choices.map((c, ci) => {
+              const votes = tallies[qi][ci];
+              const pct = total ? Math.round(votes / total * 100) : 0;
+              return `<tr><td>${esc(c)}</td><td>${votes}</td><td>${pct}%</td></tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+        <div class="bar-wrap" style="margin-top:16px">
+          ${q.choices.map((c, ci) => {
+            const votes = tallies[qi][ci];
+            const pct = total ? Math.round(votes / total * 100) : 0;
+            return `
+              <div class="bar-row">
+                <div class="bar-label" title="${esc(c)}">${esc(c)}</div>
+                <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+                <div class="bar-count">${votes}</div>
+              </div>`;
+          }).join('')}
+        </div>
+      </div>
+    `).join('')}
+  `;
+  showPage('pageResults');
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function esc(str) {
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ============================================================
+// INIT
+// ============================================================
+renderHome();
+</script>
+</body>
+</html>
