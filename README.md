@@ -2,7 +2,7 @@
 
 A full-featured survey web application built with vanilla HTML, CSS, and JavaScript.
 
-Built by **Wambue Leon** ([@lnwleon](https://github.com/lnwleon)) · Nairobi, Kenya
+Built by **Leon Njoroge** ([@lnwleon](https://github.com/lnwleon)) · Nairobi, Kenya
 
 ---
 
