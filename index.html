@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Survey App | Built by Wambue Leon</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <style>
-    /* ===== RESET & BASE ===== */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
@@ -26,63 +26,79 @@
       color: var(--text);
       font-family: 'Segoe UI', system-ui, sans-serif;
       min-height: 100vh;
+      transition: background 0.2s, color 0.2s;
     }
 
-    /* ===== NAV ===== */
+    body.light-mode {
+      --bg: #f6f8fa;
+      --surface: #ffffff;
+      --border: #d0d7de;
+      --accent: #0969da;
+      --accent2: #1a7f37;
+      --danger: #cf222e;
+      --warn: #9a6700;
+      --text: #1f2328;
+      --muted: #656d76;
+    }
+    body.light-mode .card,
+    body.light-mode .question-block {
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
     nav {
       background: var(--surface);
       border-bottom: 1px solid var(--border);
-      padding: 14px 24px;
+      padding: 12px 20px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       position: sticky;
       top: 0;
       z-index: 100;
+      flex-wrap: wrap;
+      gap: 8px;
     }
     .nav-brand { font-size: 1.2rem; font-weight: 700; color: var(--accent); letter-spacing: 1px; }
     .nav-brand span { color: var(--text); }
-    .nav-right { display: flex; gap: 10px; align-items: center; }
+    .nav-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
     .nav-user { color: var(--muted); font-size: 0.85rem; }
 
-    /* ===== BUTTONS ===== */
     button {
       cursor: pointer;
       border: none;
       border-radius: var(--radius);
-      padding: 8px 18px;
-      font-size: 0.9rem;
+      padding: 7px 16px;
+      font-size: 0.85rem;
       font-weight: 600;
-      transition: opacity 0.15s;
+      transition: opacity 0.15s, transform 0.1s;
     }
     button:hover { opacity: 0.85; }
+    button:active { transform: scale(0.97); }
     .btn-primary { background: var(--accent); color: #0d1117; }
     .btn-success { background: var(--accent2); color: #0d1117; }
     .btn-danger  { background: var(--danger);  color: #fff; }
     .btn-warn    { background: var(--warn);    color: #0d1117; }
     .btn-ghost   { background: transparent; border: 1px solid var(--border); color: var(--text); }
 
-    /* ===== LAYOUT ===== */
-    .container { max-width: 860px; margin: 0 auto; padding: 32px 20px; }
+    .container { max-width: 860px; margin: 0 auto; padding: 28px 20px; }
     .page { display: none; }
     .page.active { display: block; }
 
-    /* ===== CARDS ===== */
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 24px;
-      margin-bottom: 16px;
+      padding: 22px;
+      margin-bottom: 14px;
     }
     .card h3 { margin-bottom: 6px; font-size: 1.05rem; }
-    .card p  { color: var(--muted); font-size: 0.88rem; margin-bottom: 12px; }
+    .card p  { color: var(--muted); font-size: 0.88rem; margin-bottom: 10px; }
 
     .badge {
       display: inline-block;
-      padding: 2px 10px;
+      padding: 2px 9px;
       border-radius: 20px;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       font-weight: 700;
       margin-left: 8px;
     }
@@ -90,155 +106,217 @@
     .badge-closed { background: #2a1a1a; color: var(--danger);  }
     .badge-draft  { background: #2a2a1a; color: var(--warn);    }
 
-    /* ===== FORMS ===== */
-    .form-group { margin-bottom: 18px; }
-    label { display: block; margin-bottom: 6px; color: var(--muted); font-size: 0.88rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-    input[type="text"], input[type="password"], input[type="number"] {
-      width: 100%; padding: 10px 14px;
+    .deadline-badge {
+      display: inline-block;
+      padding: 2px 9px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      margin-left: 8px;
+      background: #1a1a2e;
+      color: var(--accent);
+    }
+
+    .form-group { margin-bottom: 16px; }
+    label { display: block; margin-bottom: 5px; color: var(--muted); font-size: 0.82rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    input[type="text"], input[type="password"], input[type="datetime-local"] {
+      width: 100%; padding: 9px 13px;
       background: var(--bg);
       border: 1px solid var(--border);
       border-radius: 8px;
       color: var(--text);
-      font-size: 0.95rem;
+      font-size: 0.92rem;
     }
     input:focus { outline: none; border-color: var(--accent); }
 
-    /* ===== QUESTIONS ===== */
     .question-block {
       background: var(--bg);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 16px;
-      margin-bottom: 14px;
+      padding: 14px;
+      margin-bottom: 12px;
     }
     .question-block .q-header {
-      display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+      display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
     }
     .question-block .q-header input { flex: 1; }
-    .choice-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+    .choice-row { display: flex; gap: 8px; margin-bottom: 7px; align-items: center; }
     .choice-row input { flex: 1; }
-    .choice-row button { padding: 5px 10px; font-size: 0.8rem; }
+    .choice-row button { padding: 4px 9px; font-size: 0.78rem; }
 
-    /* ===== SURVEY TAKE ===== */
-    .survey-question { margin-bottom: 22px; }
+    .survey-question { margin-bottom: 20px; }
     .survey-question h4 { margin-bottom: 10px; color: var(--text); }
     .option-label {
       display: flex; align-items: center; gap: 10px;
-      padding: 10px 14px;
+      padding: 9px 13px;
       border: 1px solid var(--border);
       border-radius: 8px;
       margin-bottom: 6px;
       cursor: pointer;
       transition: border-color 0.15s, background 0.15s;
     }
-    .option-label:hover { border-color: var(--accent); background: #1a2233; }
+    .option-label:hover { border-color: var(--accent); background: rgba(88,166,255,0.06); }
     .option-label input[type="radio"] { accent-color: var(--accent); width: 16px; height: 16px; }
 
-    /* ===== RESULTS ===== */
-    .results-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 0.9rem; }
+    .results-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.88rem; }
     .results-table th, .results-table td {
-      padding: 10px 14px; text-align: left;
+      padding: 9px 12px; text-align: left;
       border-bottom: 1px solid var(--border);
     }
     .results-table th { color: var(--muted); font-weight: 600; }
 
-    .bar-wrap { margin-top: 8px; }
-    .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; font-size: 0.85rem; }
-    .bar-label { width: 160px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; }
-    .bar-track { flex: 1; background: var(--border); border-radius: 4px; height: 14px; overflow: hidden; }
-    .bar-fill   { height: 100%; background: var(--accent); border-radius: 4px; transition: width 0.4s; }
-    .bar-count  { width: 30px; text-align: right; color: var(--muted); }
-
-    /* ===== LOGIN ===== */
     .login-wrap {
-      max-width: 380px; margin: 80px auto;
+      max-width: 380px; margin: 60px auto;
       background: var(--surface); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 32px;
+      border-radius: var(--radius); padding: 28px;
     }
-    .login-wrap h2 { margin-bottom: 22px; color: var(--accent); }
+    .login-wrap h2 { margin-bottom: 20px; color: var(--accent); }
 
-    /* ===== HERO ===== */
-    .hero {
-      text-align: center; padding: 48px 20px 32px;
-    }
+    .hero { text-align: center; padding: 40px 20px 28px; }
     .hero h1 { font-size: 2rem; margin-bottom: 8px; }
-    .hero p  { color: var(--muted); margin-bottom: 24px; }
+    .hero p  { color: var(--muted); margin-bottom: 22px; }
 
-    /* ===== TABS ===== */
-    .tabs { display: flex; gap: 4px; margin-bottom: 24px; border-bottom: 1px solid var(--border); }
+    .tabs { display: flex; gap: 4px; margin-bottom: 22px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
     .tab-btn {
-      padding: 10px 20px; background: transparent;
+      padding: 9px 18px; background: transparent;
       border: none; border-bottom: 2px solid transparent;
-      border-radius: 0; color: var(--muted); font-weight: 600;
+      border-radius: 0; color: var(--muted); font-weight: 600; font-size: 0.9rem;
     }
     .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
 
-    /* ===== ALERTS ===== */
     .alert {
-      padding: 12px 16px; border-radius: 8px; margin-bottom: 16px;
-      font-size: 0.9rem; display: none;
+      padding: 10px 14px; border-radius: 8px; margin-bottom: 14px;
+      font-size: 0.88rem; display: none;
     }
     .alert.show { display: block; }
     .alert-error   { background: #2a1a1a; border: 1px solid var(--danger); color: var(--danger); }
     .alert-success { background: #1a2a1a; border: 1px solid var(--accent2); color: var(--accent2); }
 
-    /* ===== FOOTER ===== */
     footer {
-      text-align: center; padding: 32px 16px;
+      text-align: center; padding: 28px 16px;
       color: var(--muted); font-size: 0.82rem;
       border-top: 1px solid var(--border); margin-top: 48px;
     }
     footer a { color: var(--accent); text-decoration: none; }
 
-    /* ===== MISC ===== */
     .flex-between { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
-    .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
-    .section-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 18px; }
-    .empty { text-align: center; color: var(--muted); padding: 40px 0; }
-    hr { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+    .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+    .section-title { font-size: 1.15rem; font-weight: 700; margin-bottom: 16px; }
+    .empty { text-align: center; color: var(--muted); padding: 36px 0; }
+
+    /* Auth modal overlay */
+    .modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.72);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      width: 100%;
+      max-width: 380px;
+    }
+    .modal-box h2 { color: var(--accent); margin-bottom: 18px; }
+
+    /* Toast */
+    #toast {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%);
+      background: var(--accent2); color: #0d1117;
+      padding: 10px 22px; border-radius: 8px;
+      font-weight: 700; font-size: 0.88rem;
+      z-index: 999; opacity: 0;
+      transition: opacity 0.25s;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    /* Chart grid */
+    .chart-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      align-items: start;
+      margin-top: 14px;
+    }
+    @media (max-width: 600px) {
+      .chart-grid { grid-template-columns: 1fr; }
+      .nav-right { gap: 4px; }
+      .nav-right button { padding: 5px 10px; font-size: 0.78rem; }
+    }
+    .chart-wrap { position: relative; height: 200px; }
   </style>
 </head>
 <body>
+
+<!-- TOAST -->
+<div id="toast"></div>
 
 <!-- ========== NAV ========== -->
 <nav>
   <div class="nav-brand">SURVEY<span>APP</span></div>
   <div class="nav-right">
+    <button class="btn-ghost" id="themeToggle" onclick="toggleTheme()" title="Toggle theme" style="padding:6px 11px;font-size:1rem">🌙</button>
     <span class="nav-user" id="navUser"></span>
-    <button class="btn-ghost" id="btnLogin"  onclick="showLogin()">Coordinator Login</button>
-    <button class="btn-danger" id="btnLogout" style="display:none" onclick="doLogout()">Logout</button>
+    <button class="btn-ghost" id="btnRegister"   onclick="openAuthModal('register')" style="font-size:0.82rem">Register</button>
+    <button class="btn-ghost" id="btnUserLogin"  onclick="openAuthModal('login')"    style="font-size:0.82rem">Login</button>
+    <button class="btn-danger" id="btnUserLogout" style="display:none;font-size:0.82rem" onclick="doUserLogout()">Logout</button>
+    <button class="btn-ghost" id="btnLogin"  onclick="showLogin()" style="font-size:0.82rem">⚙ Admin</button>
+    <button class="btn-danger" id="btnLogout" style="display:none;font-size:0.82rem" onclick="doLogout()">Admin Out</button>
   </div>
 </nav>
+
+<!-- ========== USER AUTH MODAL ========== -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal-box">
+    <h2 id="authModalTitle">Create Account</h2>
+    <div class="alert alert-error"   id="authError"></div>
+    <div class="alert alert-success" id="authSuccess"></div>
+    <div class="form-group" id="authNameGroup">
+      <label>Display Name</label>
+      <input type="text" id="authName" placeholder="Your name" />
+    </div>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="text" id="authEmail" placeholder="you@email.com" />
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="authPassword" placeholder="••••••••" />
+    </div>
+    <div class="btn-row">
+      <button class="btn-primary" id="authSubmitBtn" onclick="submitAuth()">Register</button>
+      <button class="btn-ghost" onclick="closeAuthModal()">Cancel</button>
+    </div>
+    <p id="authSwitchText" style="margin-top:12px;font-size:0.8rem;color:var(--muted)">
+      Already have an account? <a href="#" onclick="switchAuthMode('login');return false;" style="color:var(--accent)">Login here</a>
+    </p>
+  </div>
+</div>
 
 <!-- ========== HOME PAGE ========== -->
 <div class="page active" id="pageHome">
   <div class="container">
     <div class="hero">
       <h1>Survey <span style="color:var(--accent)">App</span></h1>
-      <p>Create, conduct, and analyze surveys. Built by <strong>Wambue Leon</strong> · <a href="https://github.com/lnwleon" target="_blank">@lnwleon</a></p>
+      <p>Create, conduct, and analyze surveys — Built by <strong>Wambue Leon</strong> &middot; <a href="https://github.com/lnwleon" target="_blank" style="color:var(--accent)">@lnwleon</a></p>
     </div>
-
     <div class="tabs">
       <button class="tab-btn active" onclick="switchTab('open')">📋 Open Surveys</button>
       <button class="tab-btn" onclick="switchTab('closed')">📊 Results</button>
       <button class="tab-btn" id="tabAdmin" style="display:none" onclick="switchTab('admin')">⚙️ Admin</button>
     </div>
-
-    <!-- OPEN SURVEYS TAB -->
-    <div id="tabOpen">
-      <div class="section-title">Open Surveys</div>
-      <div id="openSurveysList"></div>
-    </div>
-
-    <!-- CLOSED/RESULTS TAB -->
-    <div id="tabClosed" style="display:none">
-      <div class="section-title">Survey Results</div>
-      <div id="closedSurveysList"></div>
-    </div>
-
-    <!-- ADMIN TAB -->
+    <div id="tabOpen"><div class="section-title">Open Surveys</div><div id="openSurveysList"></div></div>
+    <div id="tabClosed" style="display:none"><div class="section-title">Survey Results</div><div id="closedSurveysList"></div></div>
     <div id="tabAdminPanel" style="display:none">
-      <div class="flex-between" style="margin-bottom:20px">
+      <div class="flex-between" style="margin-bottom:18px">
         <div class="section-title" style="margin-bottom:0">Manage Surveys</div>
         <button class="btn-primary" onclick="showCreateSurvey()">+ New Survey</button>
       </div>
@@ -247,7 +325,7 @@
   </div>
 </div>
 
-<!-- ========== LOGIN PAGE ========== -->
+<!-- ========== ADMIN LOGIN PAGE ========== -->
 <div class="page" id="pageLogin">
   <div class="login-wrap">
     <h2>Coordinator Login</h2>
@@ -264,7 +342,7 @@
       <button class="btn-primary" onclick="doLogin()">Login</button>
       <button class="btn-ghost" onclick="showPage('pageHome')">Cancel</button>
     </div>
-    <p style="color:var(--muted);font-size:0.8rem;margin-top:16px">Demo: username <strong>admin</strong> / password <strong>admin123</strong></p>
+    <p style="color:var(--muted);font-size:0.78rem;margin-top:14px">Demo: <strong>admin</strong> / <strong>admin123</strong></p>
   </div>
 </div>
 
@@ -277,6 +355,10 @@
       <div class="form-group">
         <label>Survey Title</label>
         <input type="text" id="surveyTitle" placeholder="e.g. Customer Satisfaction Survey" />
+      </div>
+      <div class="form-group">
+        <label>Deadline (optional — auto-closes survey at this date/time)</label>
+        <input type="datetime-local" id="surveyDeadline" />
       </div>
       <div id="questionsContainer"></div>
       <div class="btn-row">
@@ -313,39 +395,32 @@
 
 <script>
 // ============================================================
-// STATE
+// STATE & PERSISTENCE
 // ============================================================
 let state = {
   isAdmin: false,
+  currentUser: null,
   currentTab: 'open',
   editingSurveyId: null,
   surveys: JSON.parse(localStorage.getItem('wl_surveys') || '[]'),
 };
 
-// ============================================================
-// PERSISTENCE
-// ============================================================
-function save() {
-  localStorage.setItem('wl_surveys', JSON.stringify(state.surveys));
-}
+function save() { localStorage.setItem('wl_surveys', JSON.stringify(state.surveys)); }
+function getUsers() { return JSON.parse(localStorage.getItem('wl_users') || '[]'); }
+function saveUsers(u) { localStorage.setItem('wl_users', JSON.stringify(u)); }
 
 // ============================================================
 // PAGE ROUTING
 // ============================================================
-function showPage(pageId) {
+function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById(pageId).classList.add('active');
+  document.getElementById(id).classList.add('active');
 }
-
 function showLogin() { showPage('pageLogin'); }
-
-function showHome() {
-  renderHome();
-  showPage('pageHome');
-}
+function showHome()  { renderHome(); showPage('pageHome'); }
 
 // ============================================================
-// AUTH
+// ADMIN AUTH
 // ============================================================
 const ADMIN_CREDS = { user: 'admin', pass: 'admin123' };
 
@@ -354,12 +429,11 @@ function doLogin() {
   const p = document.getElementById('loginPass').value;
   if (u === ADMIN_CREDS.user && p === ADMIN_CREDS.pass) {
     state.isAdmin = true;
-    document.getElementById('navUser').textContent = '👤 Coordinator';
-    document.getElementById('btnLogin').style.display = 'none';
+    document.getElementById('btnLogin').style.display  = 'none';
     document.getElementById('btnLogout').style.display = '';
-    document.getElementById('tabAdmin').style.display = '';
+    document.getElementById('tabAdmin').style.display  = '';
     document.getElementById('loginError').classList.remove('show');
-    showHome();
+    showHome(); switchTab('admin');
   } else {
     document.getElementById('loginError').classList.add('show');
   }
@@ -367,12 +441,90 @@ function doLogin() {
 
 function doLogout() {
   state.isAdmin = false;
-  document.getElementById('navUser').textContent = '';
-  document.getElementById('btnLogin').style.display = '';
+  document.getElementById('btnLogin').style.display  = '';
   document.getElementById('btnLogout').style.display = 'none';
-  document.getElementById('tabAdmin').style.display = 'none';
-  showHome();
-  switchTab('open');
+  document.getElementById('tabAdmin').style.display  = 'none';
+  showHome(); switchTab('open');
+}
+
+// ============================================================
+// USER AUTH
+// ============================================================
+let authMode = 'register';
+
+function openAuthModal(mode) {
+  authMode = mode;
+  document.getElementById('authModal').classList.add('open');
+  document.getElementById('authError').classList.remove('show');
+  document.getElementById('authSuccess').classList.remove('show');
+  document.getElementById('authEmail').value    = '';
+  document.getElementById('authPassword').value = '';
+  document.getElementById('authName').value     = '';
+  switchAuthMode(mode);
+}
+
+function closeAuthModal() {
+  document.getElementById('authModal').classList.remove('open');
+}
+
+function switchAuthMode(mode) {
+  authMode = mode;
+  const isReg = mode === 'register';
+  document.getElementById('authModalTitle').textContent    = isReg ? 'Create Account' : 'Respondent Login';
+  document.getElementById('authSubmitBtn').textContent     = isReg ? 'Register' : 'Login';
+  document.getElementById('authNameGroup').style.display   = isReg ? '' : 'none';
+  document.getElementById('authSwitchText').innerHTML = isReg
+    ? 'Already have an account? <a href="#" onclick="switchAuthMode(\'login\');return false;" style="color:var(--accent)">Login here</a>'
+    : 'No account? <a href="#" onclick="switchAuthMode(\'register\');return false;" style="color:var(--accent)">Register here</a>';
+}
+
+function submitAuth() {
+  const errEl = document.getElementById('authError');
+  const okEl  = document.getElementById('authSuccess');
+  errEl.classList.remove('show'); okEl.classList.remove('show');
+
+  const email = document.getElementById('authEmail').value.trim().toLowerCase();
+  const pass  = document.getElementById('authPassword').value;
+  const name  = document.getElementById('authName').value.trim();
+
+  if (!email || !pass) { errEl.textContent = 'Email and password required.'; errEl.classList.add('show'); return; }
+
+  const users = getUsers();
+
+  if (authMode === 'register') {
+    if (!name) { errEl.textContent = 'Please enter your name.'; errEl.classList.add('show'); return; }
+    if (users.find(u => u.email === email)) { errEl.textContent = 'Email already registered.'; errEl.classList.add('show'); return; }
+    const newUser = { id: 'u_' + Date.now(), name, email, pass, completedSurveys: [] };
+    users.push(newUser);
+    saveUsers(users);
+    setCurrentUser(newUser);
+    okEl.textContent = 'Welcome, ' + name + '! Account created.';
+    okEl.classList.add('show');
+    setTimeout(closeAuthModal, 1200);
+  } else {
+    const user = users.find(u => u.email === email && u.pass === pass);
+    if (!user) { errEl.textContent = 'Invalid email or password.'; errEl.classList.add('show'); return; }
+    setCurrentUser(user);
+    closeAuthModal();
+  }
+}
+
+function setCurrentUser(user) {
+  state.currentUser = user;
+  document.getElementById('navUser').textContent        = '👤 ' + user.name;
+  document.getElementById('btnRegister').style.display  = 'none';
+  document.getElementById('btnUserLogin').style.display = 'none';
+  document.getElementById('btnUserLogout').style.display = '';
+  renderHome();
+}
+
+function doUserLogout() {
+  state.currentUser = null;
+  document.getElementById('navUser').textContent        = '';
+  document.getElementById('btnRegister').style.display  = '';
+  document.getElementById('btnUserLogin').style.display = '';
+  document.getElementById('btnUserLogout').style.display = 'none';
+  renderHome();
 }
 
 // ============================================================
@@ -382,7 +534,7 @@ function switchTab(tab) {
   state.currentTab = tab;
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   const idx = ['open','closed','admin'].indexOf(tab);
-  document.querySelectorAll('.tab-btn')[idx]?.classList.add('active');
+  if (idx >= 0) document.querySelectorAll('.tab-btn')[idx]?.classList.add('active');
   document.getElementById('tabOpen').style.display       = tab === 'open'   ? '' : 'none';
   document.getElementById('tabClosed').style.display     = tab === 'closed' ? '' : 'none';
   document.getElementById('tabAdminPanel').style.display = tab === 'admin'  ? '' : 'none';
@@ -393,6 +545,7 @@ function switchTab(tab) {
 // HOME RENDER
 // ============================================================
 function renderHome() {
+  checkDeadlines();
   renderOpenSurveys();
   renderClosedSurveys();
   if (state.isAdmin) renderAdminSurveys();
@@ -402,17 +555,33 @@ function renderOpenSurveys() {
   const el = document.getElementById('openSurveysList');
   const open = state.surveys.filter(s => s.status === 'open');
   if (!open.length) { el.innerHTML = '<div class="empty">No open surveys right now.</div>'; return; }
-  el.innerHTML = open.map(s => `
-    <div class="card">
-      <div class="flex-between">
-        <div>
-          <h3>${esc(s.title)}<span class="badge badge-open">OPEN</span></h3>
-          <p>${s.questions.length} question(s)</p>
+
+  el.innerHTML = open.map(s => {
+    const deadlineStr = s.deadline
+      ? '<span class="deadline-badge">⏰ Closes ' + new Date(s.deadline).toLocaleString() + '</span>'
+      : '';
+    const alreadyDone = state.currentUser && (() => {
+      const users = getUsers();
+      const u = users.find(x => x.id === state.currentUser.id);
+      return u && u.completedSurveys && u.completedSurveys.includes(s.id);
+    })();
+    const takeBtn = alreadyDone
+      ? '<span style="color:var(--accent2);font-size:0.85rem;font-weight:600">✅ Completed</span>'
+      : '<button class="btn-primary" onclick="startTake(\'' + s.id + '\')">Take Survey</button>';
+    return `
+      <div class="card">
+        <div class="flex-between">
+          <div>
+            <h3>${esc(s.title)}<span class="badge badge-open">OPEN</span>${deadlineStr}</h3>
+            <p>${s.questions.length} question(s) &middot; ${s.responses.length} response(s)</p>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button class="btn-ghost" onclick="shareLink('${s.id}')" title="Copy share link" style="font-size:0.82rem">🔗 Share</button>
+            ${takeBtn}
+          </div>
         </div>
-        <button class="btn-primary" onclick="startTake('${s.id}')">Take Survey</button>
-      </div>
-    </div>
-  `).join('');
+      </div>`;
+  }).join('');
 }
 
 function renderClosedSurveys() {
@@ -426,10 +595,9 @@ function renderClosedSurveys() {
           <h3>${esc(s.title)}<span class="badge badge-closed">CLOSED</span></h3>
           <p>${s.responses.length} response(s)</p>
         </div>
-        <button class="btn-ghost" onclick="viewResults('${s.id}')">View Results</button>
+        <button class="btn-ghost" onclick="viewResults('${s.id}')">📊 View Results</button>
       </div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
 function renderAdminSurveys() {
@@ -440,18 +608,17 @@ function renderAdminSurveys() {
       <div class="flex-between">
         <div>
           <h3>${esc(s.title)}<span class="badge badge-${s.status}">${s.status.toUpperCase()}</span></h3>
-          <p>${s.questions.length} question(s) · ${s.responses.length} response(s)</p>
+          <p>${s.questions.length} question(s) &middot; ${s.responses.length} response(s)${s.deadline ? ' &middot; Deadline: ' + new Date(s.deadline).toLocaleString() : ''}</p>
         </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          ${s.status === 'draft'  ? `<button class="btn-success" onclick="openSurvey('${s.id}')">▶ Open</button>` : ''}
-          ${s.status === 'open'   ? `<button class="btn-warn"    onclick="closeSurvey('${s.id}')">■ Close</button>` : ''}
-          ${s.status === 'closed' ? `<button class="btn-ghost"   onclick="viewResults('${s.id}')">📊 Results</button>` : ''}
-          ${s.status === 'draft'  ? `<button class="btn-ghost"   onclick="editSurvey('${s.id}')">✏️ Edit</button>` : ''}
+        <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
+          ${s.status === 'draft'  ? '<button class="btn-success" onclick="openSurvey(\'' + s.id + '\')">▶ Open</button>' : ''}
+          ${s.status === 'open'   ? '<button class="btn-warn" onclick="closeSurvey(\'' + s.id + '\')">■ Close</button>' : ''}
+          ${s.status === 'closed' ? '<button class="btn-ghost" onclick="viewResults(\'' + s.id + '\')">📊 Results</button>' : ''}
+          ${s.status !== 'closed' ? '<button class="btn-ghost" onclick="editSurvey(\'' + s.id + '\')">✏️ Edit</button>' : ''}
           <button class="btn-danger" onclick="deleteSurvey('${s.id}')">🗑</button>
         </div>
       </div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
 // ============================================================
@@ -460,16 +627,13 @@ function renderAdminSurveys() {
 function showCreateSurvey(id = null) {
   state.editingSurveyId = id;
   const existing = id ? state.surveys.find(s => s.id === id) : null;
-
   document.getElementById('createError').classList.remove('show');
-  document.getElementById('surveyTitle').value = existing ? existing.title : '';
+  document.getElementById('surveyTitle').value    = existing ? existing.title : '';
+  document.getElementById('surveyDeadline').value = existing && existing.deadline ? existing.deadline : '';
   document.getElementById('questionsContainer').innerHTML = '';
-
-  if (existing) {
-    existing.questions.forEach(q => addQuestion(q));
-  } else {
-    addQuestion();
-  }
+  qCount = 0;
+  if (existing) { existing.questions.forEach(q => addQuestion(q)); }
+  else { addQuestion(); }
   showPage('pageCreate');
 }
 
@@ -477,36 +641,32 @@ function editSurvey(id) { showCreateSurvey(id); }
 
 let qCount = 0;
 function addQuestion(existing = null) {
-  const qId = ++qCount;
   const curCount = document.querySelectorAll('.question-block').length;
   if (curCount >= 10) { alert('Maximum 10 questions allowed.'); return; }
-
+  const qId = ++qCount;
   const qTitle = existing ? esc(existing.text) : '';
   const choices = existing ? existing.choices : ['', ''];
-
   const div = document.createElement('div');
   div.className = 'question-block';
   div.dataset.qid = qId;
   div.innerHTML = `
     <div class="q-header">
-      <span style="color:var(--muted);font-weight:700;white-space:nowrap">Q${curCount + 1}</span>
+      <span style="color:var(--muted);font-weight:700;white-space:nowrap;font-size:0.88rem">Q${curCount + 1}</span>
       <input type="text" placeholder="Question text..." value="${qTitle}" class="q-text" />
-      <button class="btn-danger" style="padding:5px 10px" onclick="removeQuestion(this)">✕</button>
+      <button class="btn-danger" style="padding:4px 9px;flex-shrink:0" onclick="removeQuestion(this)">✕</button>
     </div>
     <div class="choices-list">
-      ${choices.map((c,i) => choiceHTML(i, c)).join('')}
+      ${choices.map((c, i) => choiceHTML(i, c)).join('')}
     </div>
-    <button class="btn-ghost" style="font-size:0.8rem;padding:5px 12px;margin-top:6px" onclick="addChoice(this)">+ Choice</button>
-  `;
+    <button class="btn-ghost" style="font-size:0.78rem;padding:4px 11px;margin-top:5px" onclick="addChoice(this)">+ Choice</button>`;
   document.getElementById('questionsContainer').appendChild(div);
 }
 
 function choiceHTML(i, val = '') {
-  return `
-    <div class="choice-row">
-      <input type="text" placeholder="Choice ${i+1}" value="${esc(val)}" class="c-text" />
-      <button class="btn-danger" onclick="removeChoice(this)">✕</button>
-    </div>`;
+  return `<div class="choice-row">
+    <input type="text" placeholder="Choice ${i+1}" value="${esc(val)}" class="c-text" />
+    <button class="btn-danger" onclick="removeChoice(this)">✕</button>
+  </div>`;
 }
 
 function addChoice(btn) {
@@ -524,71 +684,44 @@ function removeChoice(btn) {
 function removeQuestion(btn) {
   if (document.querySelectorAll('.question-block').length <= 1) { alert('Need at least 1 question.'); return; }
   btn.closest('.question-block').remove();
-  renumberQuestions();
-}
-
-function renumberQuestions() {
   document.querySelectorAll('.question-block').forEach((b, i) => {
-    b.querySelector('.q-header span').textContent = `Q${i + 1}`;
+    b.querySelector('.q-header span').textContent = 'Q' + (i + 1);
   });
 }
 
 function saveSurvey() {
   const errEl = document.getElementById('createError');
   errEl.classList.remove('show');
-
-  const title = document.getElementById('surveyTitle').value.trim();
+  const title    = document.getElementById('surveyTitle').value.trim();
+  const deadline = document.getElementById('surveyDeadline').value || null;
   if (!title) { errEl.textContent = 'Please enter a survey title.'; errEl.classList.add('show'); return; }
 
   const questions = [];
   let valid = true;
   document.querySelectorAll('.question-block').forEach((block, qi) => {
+    if (!valid) return;
     const qText = block.querySelector('.q-text').value.trim();
-    if (!qText) { errEl.textContent = `Question ${qi+1} is empty.`; errEl.classList.add('show'); valid = false; return; }
+    if (!qText) { errEl.textContent = 'Question ' + (qi+1) + ' is empty.'; errEl.classList.add('show'); valid = false; return; }
     const choices = [];
-    block.querySelectorAll('.c-text').forEach(inp => {
-      const v = inp.value.trim();
-      if (v) choices.push(v);
-    });
-    if (choices.length < 2) { errEl.textContent = `Question ${qi+1} needs at least 2 choices.`; errEl.classList.add('show'); valid = false; return; }
+    block.querySelectorAll('.c-text').forEach(inp => { if (inp.value.trim()) choices.push(inp.value.trim()); });
+    if (choices.length < 2) { errEl.textContent = 'Question ' + (qi+1) + ' needs at least 2 choices.'; errEl.classList.add('show'); valid = false; return; }
     questions.push({ text: qText, choices });
   });
-  if (!valid) return;
-  if (!questions.length) { errEl.textContent = 'Add at least 1 question.'; errEl.classList.add('show'); return; }
+  if (!valid || !questions.length) return;
 
   if (state.editingSurveyId) {
     const s = state.surveys.find(x => x.id === state.editingSurveyId);
-    s.title = title;
-    s.questions = questions;
+    s.title = title; s.questions = questions; s.deadline = deadline;
   } else {
-    state.surveys.push({
-      id: 'sv_' + Date.now(),
-      title,
-      questions,
-      status: 'draft',
-      responses: [],
-      createdAt: new Date().toISOString(),
-    });
+    state.surveys.push({ id: 'sv_' + Date.now(), title, questions, deadline, status: 'draft', responses: [], createdAt: new Date().toISOString() });
   }
-  save();
-  showHome();
-  switchTab('admin');
+  save(); showHome(); switchTab('admin');
 }
 
-function openSurvey(id) {
-  const s = state.surveys.find(x => x.id === id);
-  s.status = 'open';
-  save(); renderHome();
-}
-
-function closeSurvey(id) {
-  const s = state.surveys.find(x => x.id === id);
-  s.status = 'closed';
-  save(); renderHome();
-}
-
+function openSurvey(id)  { state.surveys.find(x => x.id === id).status = 'open';   save(); renderHome(); }
+function closeSurvey(id) { state.surveys.find(x => x.id === id).status = 'closed'; save(); renderHome(); }
 function deleteSurvey(id) {
-  if (!confirm('Delete this survey?')) return;
+  if (!confirm('Delete this survey? This cannot be undone.')) return;
   state.surveys = state.surveys.filter(x => x.id !== id);
   save(); renderHome();
 }
@@ -597,9 +730,16 @@ function deleteSurvey(id) {
 // TAKE SURVEY
 // ============================================================
 function startTake(id) {
+  if (state.currentUser) {
+    const users = getUsers();
+    const u = users.find(x => x.id === state.currentUser.id);
+    if (u && u.completedSurveys && u.completedSurveys.includes(id)) {
+      alert('You have already completed this survey. Thank you!');
+      return;
+    }
+  }
   const s = state.surveys.find(x => x.id === id);
-  const el = document.getElementById('takeSurveyContent');
-  el.innerHTML = `
+  document.getElementById('takeSurveyContent').innerHTML = `
     <div class="section-title">${esc(s.title)}</div>
     <div class="alert alert-error" id="takeError"></div>
     <form id="surveyForm">
@@ -608,18 +748,15 @@ function startTake(id) {
           <h4>Q${qi+1}. ${esc(q.text)}</h4>
           ${q.choices.map((c, ci) => `
             <label class="option-label">
-              <input type="radio" name="q${qi}" value="${ci}" required />
+              <input type="radio" name="q${qi}" value="${ci}" />
               ${esc(c)}
-            </label>
-          `).join('')}
-        </div>
-      `).join('')}
+            </label>`).join('')}
+        </div>`).join('')}
     </form>
     <div class="btn-row">
       <button class="btn-success" onclick="submitSurvey('${s.id}')">✅ Submit</button>
       <button class="btn-ghost" onclick="showHome()">Cancel</button>
-    </div>
-  `;
+    </div>`;
   showPage('pageTake');
 }
 
@@ -627,97 +764,212 @@ function submitSurvey(id) {
   const s = state.surveys.find(x => x.id === id);
   const errEl = document.getElementById('takeError');
   errEl.classList.remove('show');
-
   const answers = [];
   let allAnswered = true;
   s.questions.forEach((q, qi) => {
-    const checked = document.querySelector(`input[name="q${qi}"]:checked`);
+    const checked = document.querySelector('input[name="q' + qi + '"]:checked');
     if (!checked) { allAnswered = false; return; }
     answers.push(parseInt(checked.value));
   });
+  if (!allAnswered) { errEl.textContent = 'Please answer all questions before submitting.'; errEl.classList.add('show'); return; }
 
-  if (!allAnswered) {
-    errEl.textContent = 'Please answer all questions before submitting.';
-    errEl.classList.add('show');
-    return;
-  }
-
-  s.responses.push({ answers, at: new Date().toISOString() });
+  const respondentName = state.currentUser ? state.currentUser.name : 'Anonymous';
+  s.responses.push({ answers, at: new Date().toISOString(), respondent: respondentName });
   save();
 
-  // Thank you screen
+  if (state.currentUser) {
+    const users = getUsers();
+    const u = users.find(x => x.id === state.currentUser.id);
+    if (u) {
+      u.completedSurveys = u.completedSurveys || [];
+      if (!u.completedSurveys.includes(id)) u.completedSurveys.push(id);
+      saveUsers(users);
+      state.currentUser = u;
+    }
+  }
+
   document.getElementById('takeSurveyContent').innerHTML = `
     <div class="card" style="text-align:center;padding:48px">
       <div style="font-size:3rem">🎉</div>
-      <h2 style="margin:16px 0 8px">Thank you!</h2>
-      <p style="color:var(--muted)">Your response has been recorded.</p>
+      <h2 style="margin:16px 0 8px">Thank you${state.currentUser ? ', ' + esc(state.currentUser.name) : ''}!</h2>
+      <p style="color:var(--muted)">Your response has been recorded successfully.</p>
       <div class="btn-row" style="justify-content:center;margin-top:24px">
         <button class="btn-primary" onclick="showHome()">Back to Home</button>
       </div>
-    </div>
-  `;
+    </div>`;
 }
 
 // ============================================================
-// VIEW RESULTS
+// VIEW RESULTS — CHARTS
 // ============================================================
+window._surveyCharts = [];
+window._currentChartType = 'bar';
+
 function viewResults(id) {
   const s = state.surveys.find(x => x.id === id);
-  const el = document.getElementById('resultsContent');
-
-  // Tally
   const tallies = s.questions.map(q => new Array(q.choices.length).fill(0));
-  s.responses.forEach(r => {
-    r.answers.forEach((ans, qi) => { tallies[qi][ans]++; });
-  });
+  s.responses.forEach(r => { r.answers.forEach((ans, qi) => { tallies[qi][ans]++; }); });
   const total = s.responses.length;
+  const chartColors = ['rgba(88,166,255,0.85)','rgba(63,185,80,0.85)','rgba(248,81,73,0.85)','rgba(210,153,34,0.85)','rgba(163,113,247,0.85)'];
 
-  el.innerHTML = `
-    <div class="flex-between" style="margin-bottom:20px">
+  document.getElementById('resultsContent').innerHTML = `
+    <div class="flex-between" style="margin-bottom:18px">
       <div>
         <div class="section-title" style="margin-bottom:4px">${esc(s.title)}</div>
-        <span style="color:var(--muted);font-size:0.88rem">${total} response(s)</span>
+        <span style="color:var(--muted);font-size:0.86rem">${total} response(s)</span>
       </div>
-      <button class="btn-ghost" onclick="showHome()">← Back</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn-ghost" id="chartToggleBtn" onclick="toggleChartType()" style="font-size:0.82rem">Switch to Pie</button>
+        <button class="btn-primary" onclick="exportCSV('${s.id}')" style="font-size:0.82rem">⬇ Export CSV</button>
+        <button class="btn-ghost" onclick="showHome()" style="font-size:0.82rem">← Back</button>
+      </div>
     </div>
     ${s.questions.map((q, qi) => `
       <div class="card">
-        <h3>Q${qi+1}. ${esc(q.text)}</h3>
-        <table class="results-table">
-          <thead><tr><th>Choice</th><th>Votes</th><th>%</th></tr></thead>
-          <tbody>
-            ${q.choices.map((c, ci) => {
-              const votes = tallies[qi][ci];
-              const pct = total ? Math.round(votes / total * 100) : 0;
-              return `<tr><td>${esc(c)}</td><td>${votes}</td><td>${pct}%</td></tr>`;
-            }).join('')}
-          </tbody>
-        </table>
-        <div class="bar-wrap" style="margin-top:16px">
-          ${q.choices.map((c, ci) => {
-            const votes = tallies[qi][ci];
-            const pct = total ? Math.round(votes / total * 100) : 0;
-            return `
-              <div class="bar-row">
-                <div class="bar-label" title="${esc(c)}">${esc(c)}</div>
-                <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
-                <div class="bar-count">${votes}</div>
-              </div>`;
-          }).join('')}
+        <h3 style="margin-bottom:14px">Q${qi+1}. ${esc(q.text)}</h3>
+        <div class="chart-grid">
+          <table class="results-table">
+            <thead><tr><th>Choice</th><th>Votes</th><th>%</th></tr></thead>
+            <tbody>
+              ${q.choices.map((c, ci) => {
+                const votes = tallies[qi][ci];
+                const pct = total ? Math.round(votes / total * 100) : 0;
+                return '<tr><td>' + esc(c) + '</td><td>' + votes + '</td><td>' + pct + '%</td></tr>';
+              }).join('')}
+            </tbody>
+          </table>
+          <div class="chart-wrap"><canvas id="chart_${qi}"></canvas></div>
         </div>
-      </div>
-    `).join('')}
-  `;
+      </div>`).join('')}`;
+
+  window._surveyCharts = [];
+  window._currentChartType = 'bar';
+
+  s.questions.forEach((q, qi) => {
+    const ctx = document.getElementById('chart_' + qi).getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: q.choices.map(c => c.length > 16 ? c.slice(0,14) + '…' : c),
+        datasets: [{ data: tallies[qi], backgroundColor: chartColors, borderRadius: 6, borderSkipped: false }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: ctx => ' ' + ctx.raw + ' vote(s) (' + (total ? Math.round(ctx.raw/total*100) : 0) + '%)' } }
+        },
+        scales: {
+          y: { beginAtZero: true, ticks: { stepSize: 1, color: '#8b949e' }, grid: { color: 'rgba(48,54,61,0.8)' } },
+          x: { ticks: { color: '#8b949e' }, grid: { display: false } }
+        }
+      }
+    });
+    window._surveyCharts.push(chart);
+  });
   showPage('pageResults');
 }
+
+function toggleChartType() {
+  window._currentChartType = window._currentChartType === 'bar' ? 'pie' : 'bar';
+  document.getElementById('chartToggleBtn').textContent = window._currentChartType === 'bar' ? 'Switch to Pie' : 'Switch to Bar';
+  window._surveyCharts.forEach(chart => {
+    chart.config.type = window._currentChartType;
+    if (window._currentChartType === 'pie') {
+      chart.options.scales = {};
+      chart.options.plugins.legend = { display: true, labels: { color: '#e6edf3', font: { size: 11 }, boxWidth: 14 } };
+    } else {
+      chart.options.scales = {
+        y: { beginAtZero: true, ticks: { stepSize: 1, color: '#8b949e' }, grid: { color: 'rgba(48,54,61,0.8)' } },
+        x: { ticks: { color: '#8b949e' }, grid: { display: false } }
+      };
+      chart.options.plugins.legend = { display: false };
+    }
+    chart.update();
+  });
+}
+
+// ============================================================
+// EXPORT CSV
+// ============================================================
+function exportCSV(id) {
+  const s = state.surveys.find(x => x.id === id);
+  if (!s.responses.length) { alert('No responses to export yet.'); return; }
+  const headers = ['Respondent', 'Submitted At', ...s.questions.map((q, i) => 'Q' + (i+1) + ': ' + q.text)];
+  const rows = s.responses.map(r => {
+    const name = r.respondent || 'Anonymous';
+    const time = new Date(r.at).toLocaleString();
+    const answers = r.answers.map((ans, qi) => s.questions[qi].choices[ans]);
+    return [name, time, ...answers];
+  });
+  const csv = [headers, ...rows].map(row => row.map(cell => '"' + String(cell).replace(/"/g, '""') + '"').join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = s.title.replace(/\s+/g, '_') + '_results.csv'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ============================================================
+// DEADLINE AUTO-CLOSE
+// ============================================================
+function checkDeadlines() {
+  const now = new Date(); let changed = false;
+  state.surveys.forEach(s => {
+    if (s.status === 'open' && s.deadline && new Date(s.deadline) <= now) {
+      s.status = 'closed'; changed = true;
+    }
+  });
+  if (changed) save();
+}
+checkDeadlines();
+setInterval(() => { checkDeadlines(); renderHome(); }, 30000);
+
+// ============================================================
+// THEME TOGGLE
+// ============================================================
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light-mode');
+  document.getElementById('themeToggle').textContent = isLight ? '☀️' : '🌙';
+  localStorage.setItem('wl_theme', isLight ? 'light' : 'dark');
+}
+(function initTheme() {
+  if (localStorage.getItem('wl_theme') === 'light') {
+    document.body.classList.add('light-mode');
+    document.getElementById('themeToggle').textContent = '☀️';
+  }
+})();
+
+// ============================================================
+// SHARE LINK
+// ============================================================
+function shareLink(surveyId) {
+  const url = window.location.href.split('#')[0] + '#survey=' + surveyId;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(() => showToast('Link copied to clipboard!')).catch(() => prompt('Copy this link:', url));
+  } else { prompt('Copy this link:', url); }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.opacity = '1';
+  setTimeout(() => { t.style.opacity = '0'; }, 2500);
+}
+
+(function checkShareLink() {
+  const hash = window.location.hash;
+  if (hash.startsWith('#survey=')) {
+    const id = hash.replace('#survey=', '');
+    const s = state.surveys.find(x => x.id === id);
+    if (s && s.status === 'open') setTimeout(() => startTake(id), 300);
+  }
+})();
 
 // ============================================================
 // UTILS
 // ============================================================
 function esc(str) {
-  return String(str)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 // ============================================================
