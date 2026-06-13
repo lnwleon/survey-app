@@ -35,4 +35,4 @@ Based on the [Survey App idea](https://github.com/florinpop17/app-ideas/blob/mas
 
 ---
 
-> Built as part of my web development portfolio — Wambue Leon, 2025
+> Built as part of my web development portfolio — Leon Njoroge, 2025
