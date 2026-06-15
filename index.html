@@ -3,31 +3,32 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SURVEY_OS v1.0 // WAMBUE LEON</title>
+  <title>SURVEY_OS v2.0 // Kenya Voice Platform — Wambue Leon</title>
+  <meta name="description" content="Real surveys for Kenya's tech community, youth, and SME owners. Built by Wambue Leon, Nairobi."/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:       #0a0e0a;
-      --bg2:      #0d120d;
-      --surface:  #111811;
-      --border:   #1e2e1e;
-      --border2:  #2a3e2a;
-      --green:    #39ff14;
-      --green2:   #00cc00;
-      --green3:   #007700;
-      --green4:   #003300;
-      --amber:    #ffb800;
-      --red:      #ff3333;
-      --cyan:     #00ffcc;
-      --muted:    #3a5c3a;
-      --text:     #c8e6c8;
-      --text2:    #8ab88a;
-      --radius:   2px;
-      --font:     'JetBrains Mono', 'Share Tech Mono', monospace;
+      --bg:      #080c08;
+      --bg2:     #0c110c;
+      --surface: #101810;
+      --border:  #1a2e1a;
+      --border2: #243e24;
+      --green:   #39ff14;
+      --green2:  #00cc00;
+      --green3:  #006600;
+      --green4:  #0a1e0a;
+      --amber:   #ffb800;
+      --red:     #ff4444;
+      --cyan:    #00ffcc;
+      --purple:  #b966ff;
+      --muted:   #2e4e2e;
+      --text:    #b8dcb8;
+      --text2:   #6a9a6a;
+      --font:    'JetBrains Mono', monospace;
     }
 
     html { scroll-behavior: smooth; }
@@ -37,627 +38,606 @@
       color: var(--text);
       font-family: var(--font);
       font-size: 13px;
-      line-height: 1.6;
+      line-height: 1.7;
       min-height: 100vh;
-      overflow-x: hidden;
     }
 
-    /* CRT scanline overlay */
     body::before {
       content: '';
-      position: fixed;
-      inset: 0;
-      background: repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 2px,
-        rgba(0,0,0,0.08) 2px,
-        rgba(0,0,0,0.08) 4px
-      );
-      pointer-events: none;
-      z-index: 9999;
-    }
-
-    /* ===== BOOT SCREEN ===== */
-    #bootScreen {
       position: fixed; inset: 0;
-      background: var(--bg);
-      z-index: 8000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 6px;
-      padding: 40px;
-    }
-    #bootScreen.hidden { display: none; }
-    .boot-line {
-      font-size: 12px;
-      color: var(--green2);
-      opacity: 0;
-      animation: bootFade 0.1s forwards;
-      width: 100%;
-      max-width: 600px;
-    }
-    @keyframes bootFade { to { opacity: 1; } }
-    .boot-bar {
-      width: 100%; max-width: 600px;
-      height: 2px;
-      background: var(--green4);
-      margin-top: 8px;
-    }
-    .boot-bar-fill {
-      height: 100%;
-      background: var(--green);
-      width: 0%;
-      transition: width 0.05s linear;
-      box-shadow: 0 0 8px var(--green);
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px);
+      pointer-events: none;
+      z-index: 9998;
     }
 
-    /* ===== NAV / STATUSBAR ===== */
-    #statusBar {
+    /* ===== BOOT ===== */
+    #boot {
+      position: fixed; inset: 0; background: var(--bg);
+      z-index: 9000; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; padding: 32px;
+    }
+    #boot.gone { display: none; }
+    .bl { font-size: 12px; color: var(--green2); opacity: 0; animation: bf .05s forwards; width: 100%; max-width: 620px; }
+    @keyframes bf { to { opacity:1; } }
+    .bbar { width:100%; max-width:620px; height:2px; background:var(--green3); margin-top:12px; }
+    .bfill { height:100%; background:var(--green); width:0; transition:width .04s linear; box-shadow:0 0 8px var(--green); }
+
+    /* ===== NAV ===== */
+    nav {
       background: var(--surface);
       border-bottom: 1px solid var(--border2);
-      padding: 8px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 8px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      font-size: 11px;
+      padding: 9px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 8px;
+      position: sticky; top: 0; z-index: 100;
     }
-    .status-left { display: flex; align-items: center; gap: 16px; }
-    .status-brand {
-      color: var(--green);
-      font-weight: 700;
-      font-size: 13px;
-      letter-spacing: 2px;
-      text-shadow: 0 0 10px rgba(57,255,20,0.6);
-    }
-    .status-pill {
-      display: flex; align-items: center; gap: 5px;
-      color: var(--text2);
-    }
-    .status-dot {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--green);
-      box-shadow: 0 0 6px var(--green);
-      animation: blink 2s infinite;
-    }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-    .status-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .status-user { color: var(--cyan); font-size: 11px; }
-    #clock { color: var(--muted); font-size: 11px; min-width: 60px; text-align: right; }
+    .brand { font-size: 13px; font-weight: 700; color: var(--green); letter-spacing: 2px; text-shadow: 0 0 12px rgba(57,255,20,.5); }
+    .brand sub { font-size: 9px; color: var(--text2); letter-spacing: 1px; display: block; }
+    .nav-r { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    #clock { color: var(--muted); font-size: 10px; min-width: 55px; }
+    .dot { width:6px; height:6px; border-radius:50%; background:var(--green); box-shadow:0 0 6px var(--green); display:inline-block; animation:blink 2s infinite; margin-right:4px; }
+    @keyframes blink { 0%,100%{opacity:1}50%{opacity:.2} }
 
-    /* ===== NAV BUTTONS ===== */
-    .cmd-btn {
-      background: transparent;
-      border: 1px solid var(--border2);
-      border-radius: var(--radius);
-      color: var(--text2);
-      font-family: var(--font);
-      font-size: 11px;
-      padding: 4px 10px;
-      cursor: pointer;
-      transition: all 0.15s;
+    /* ===== BUTTONS ===== */
+    .btn {
+      background: transparent; border: 1px solid var(--border2);
+      border-radius: 2px; color: var(--text2); font-family: var(--font);
+      font-size: 11px; padding: 5px 11px; cursor: pointer; transition: all .12s; letter-spacing: .5px;
     }
-    .cmd-btn:hover { border-color: var(--green); color: var(--green); background: var(--green4); box-shadow: 0 0 8px rgba(57,255,20,0.2); }
-    .cmd-btn.active-btn { border-color: var(--green); color: var(--green); background: var(--green4); }
-    .cmd-btn.danger  { border-color: var(--red); color: var(--red); }
-    .cmd-btn.danger:hover  { background: rgba(255,51,51,0.1); }
-    .cmd-btn.primary { border-color: var(--green); color: var(--bg); background: var(--green); font-weight: 700; }
-    .cmd-btn.primary:hover { background: var(--green2); }
-    .cmd-btn.amber  { border-color: var(--amber); color: var(--amber); }
-    .cmd-btn.amber:hover  { background: rgba(255,184,0,0.1); }
+    .btn:hover { border-color: var(--green); color: var(--green); background: var(--green4); }
+    .btn.primary { background: var(--green); color: #040804; border-color: var(--green); font-weight: 700; }
+    .btn.primary:hover { background: var(--green2); border-color: var(--green2); }
+    .btn.danger { border-color: var(--red); color: var(--red); }
+    .btn.danger:hover { background: rgba(255,68,68,.08); }
+    .btn.amber { border-color: var(--amber); color: var(--amber); }
+    .btn.amber:hover { background: rgba(255,184,0,.08); }
+    .btn.cyan { border-color: var(--cyan); color: var(--cyan); }
+    .btn.cyan:hover { background: rgba(0,255,204,.08); }
+    .btn.purple { border-color: var(--purple); color: var(--purple); }
+    .btn.purple:hover { background: rgba(185,102,255,.08); }
 
     /* ===== LAYOUT ===== */
-    .container { max-width: 900px; margin: 0 auto; padding: 24px 20px; }
+    .wrap { max-width: 920px; margin: 0 auto; padding: 24px 18px; }
     .page { display: none; }
     .page.active { display: block; }
 
-    /* ===== TERMINAL PROMPT ===== */
-    .prompt { color: var(--green); }
-    .prompt-user { color: var(--cyan); }
-    .prompt-path { color: var(--text2); }
+    /* ===== CARDS ===== */
+    .card {
+      background: var(--surface); border: 1px solid var(--border2);
+      border-left: 2px solid var(--green3); border-radius: 2px;
+      padding: 18px 20px; margin-bottom: 12px; transition: border-left-color .2s;
+    }
+    .card:hover { border-left-color: var(--green2); }
+    .card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+    .card-title { font-size: 13px; font-weight: 600; color: var(--green); margin-bottom: 3px; }
+    .card-meta  { font-size: 10px; color: var(--text2); letter-spacing: .5px; }
+    .card-acts  { display: flex; gap: 6px; flex-wrap: wrap; flex-shrink: 0; }
 
-    /* ===== TERMINAL BLOCK ===== */
-    .term-block {
-      background: var(--surface);
-      border: 1px solid var(--border2);
-      border-radius: var(--radius);
-      padding: 18px 20px;
-      margin-bottom: 14px;
-      position: relative;
-    }
-    .term-block::before {
-      content: '';
-      position: absolute;
-      left: 0; top: 0; bottom: 0;
-      width: 2px;
-      background: var(--green3);
-    }
-    .term-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    .term-title { font-size: 13px; font-weight: 600; color: var(--green); margin-bottom: 4px; }
-    .term-meta  { color: var(--text2); font-size: 11px; margin-bottom: 10px; }
-    .term-actions { display: flex; gap: 6px; flex-wrap: wrap; flex-shrink: 0; }
+    /* ===== SURVEY CATEGORY COLORS ===== */
+    .cat-tech   { border-left-color: var(--cyan); }
+    .cat-youth  { border-left-color: var(--amber); }
+    .cat-sme    { border-left-color: var(--purple); }
+    .cat-health { border-left-color: #ff6b6b; }
+    .cat-edu    { border-left-color: #66ffcc; }
 
     /* ===== BADGES ===== */
-    .badge {
-      display: inline-block;
-      padding: 1px 8px;
-      border-radius: 0;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      margin-left: 8px;
-      font-family: var(--font);
-    }
-    .badge-open   { border: 1px solid var(--green); color: var(--green); background: var(--green4); }
-    .badge-closed { border: 1px solid var(--red);   color: var(--red);   background: rgba(255,51,51,0.08); }
-    .badge-draft  { border: 1px solid var(--amber); color: var(--amber); background: rgba(255,184,0,0.08); }
-    .badge-live   { border: 1px solid var(--cyan);  color: var(--cyan);  background: rgba(0,255,204,0.08); }
+    .badge { display:inline-block; padding:1px 7px; font-size:9px; font-weight:700; letter-spacing:1px; border:1px solid; margin-left:6px; }
+    .badge-open   { border-color:var(--green);  color:var(--green); }
+    .badge-closed { border-color:var(--red);    color:var(--red); }
+    .badge-draft  { border-color:var(--amber);  color:var(--amber); }
+    .badge-tech   { border-color:var(--cyan);   color:var(--cyan); }
+    .badge-youth  { border-color:var(--amber);  color:var(--amber); }
+    .badge-sme    { border-color:var(--purple); color:var(--purple); }
+    .badge-health { border-color:#ff6b6b;       color:#ff6b6b; }
+    .badge-edu    { border-color:#66ffcc;        color:#66ffcc; }
 
-    /* ===== SECTION HEADER ===== */
-    .section-cmd {
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 16px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--border);
-    }
-    .section-cmd span { color: var(--green2); }
-    .section-title { font-size: 14px; font-weight: 700; color: var(--green); letter-spacing: 1px; margin-bottom: 14px; }
+    /* ===== PROMPT ===== */
+    .prompt { font-size: 11px; color: var(--muted); margin-bottom: 14px; letter-spacing: .5px; }
+    .prompt span { color: var(--green2); }
+    .sec-title { font-size: 14px; font-weight: 700; color: var(--green); letter-spacing: 1px; margin-bottom: 14px; }
 
     /* ===== TABS ===== */
-    .tabs {
-      display: flex;
-      gap: 0;
-      margin-bottom: 22px;
-      border-bottom: 1px solid var(--border2);
-      overflow-x: auto;
-    }
-    .tab-btn {
-      background: transparent;
-      border: none;
-      border-bottom: 2px solid transparent;
-      color: var(--muted);
-      font-family: var(--font);
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 1px;
-      padding: 8px 16px;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: all 0.15s;
-    }
-    .tab-btn:hover  { color: var(--text2); }
-    .tab-btn.active { color: var(--green); border-bottom-color: var(--green); }
+    .tabs { display:flex; border-bottom:1px solid var(--border2); margin-bottom:20px; flex-wrap:wrap; gap:0; overflow-x:auto; }
+    .tab { background:transparent; border:none; border-bottom:2px solid transparent; color:var(--muted); font-family:var(--font); font-size:11px; font-weight:600; letter-spacing:.5px; padding:8px 14px; cursor:pointer; white-space:nowrap; transition:all .12s; }
+    .tab:hover { color:var(--text2); }
+    .tab.on { color:var(--green); border-bottom-color:var(--green); }
 
     /* ===== FORMS ===== */
-    .form-group { margin-bottom: 16px; }
-    .form-label {
-      display: block;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      color: var(--muted);
-      text-transform: uppercase;
-      margin-bottom: 5px;
+    .fg { margin-bottom: 14px; }
+    .fl { display:block; font-size:9px; font-weight:700; letter-spacing:2px; color:var(--muted); text-transform:uppercase; margin-bottom:4px; }
+    .fl::before { content:'// '; color:var(--green3); }
+    .fi {
+      width:100%; padding:8px 11px;
+      background:var(--bg); border:1px solid var(--border2); border-radius:2px;
+      color:var(--text); font-family:var(--font); font-size:12px; transition:border-color .12s;
     }
-    .form-label::before { content: '// '; color: var(--green3); }
-    .form-input {
-      width: 100%;
-      padding: 8px 12px;
-      background: var(--bg);
-      border: 1px solid var(--border2);
-      border-radius: var(--radius);
-      color: var(--text);
-      font-family: var(--font);
-      font-size: 12px;
-      transition: border-color 0.15s, box-shadow 0.15s;
-    }
-    .form-input:focus {
-      outline: none;
-      border-color: var(--green);
-      box-shadow: 0 0 0 1px rgba(57,255,20,0.2);
-    }
-    .form-input::placeholder { color: var(--green3); }
+    .fi:focus { outline:none; border-color:var(--green); box-shadow:0 0 0 1px rgba(57,255,20,.15); }
+    .fi::placeholder { color:var(--green3); }
+    select.fi { cursor:pointer; }
 
     /* ===== QUESTION BUILDER ===== */
-    .q-block {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-left: 2px solid var(--green3);
-      border-radius: var(--radius);
-      padding: 14px;
-      margin-bottom: 10px;
-    }
-    .q-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-    .q-num { color: var(--green3); font-size: 10px; font-weight: 700; letter-spacing: 2px; white-space: nowrap; min-width: 30px; }
-    .q-header input { flex: 1; }
-    .choice-row { display: flex; gap: 8px; margin-bottom: 6px; align-items: center; }
-    .choice-row input { flex: 1; }
-    .choice-row button { padding: 3px 8px; font-size: 10px; }
+    .qb { background:var(--bg2); border:1px solid var(--border); border-left:2px solid var(--green3); padding:12px; margin-bottom:8px; }
+    .qh { display:flex; gap:8px; align-items:center; margin-bottom:8px; }
+    .qn { color:var(--green3); font-size:9px; font-weight:700; letter-spacing:2px; white-space:nowrap; }
+    .cr { display:flex; gap:6px; margin-bottom:5px; align-items:center; }
+    .cr input { flex:1; }
 
-    /* ===== SURVEY TAKE ===== */
-    .q-take { margin-bottom: 18px; }
-    .q-take h4 { color: var(--green2); margin-bottom: 10px; font-size: 12px; }
-    .radio-label {
-      display: flex; align-items: center; gap: 10px;
-      padding: 8px 12px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      margin-bottom: 5px;
-      cursor: pointer;
-      font-size: 12px;
-      transition: all 0.12s;
-    }
-    .radio-label:hover { border-color: var(--green); color: var(--green); background: var(--green4); }
-    .radio-label input[type="radio"] { accent-color: var(--green); }
-    .radio-label::before { content: '[ ]'; color: var(--green3); font-size: 10px; margin-right: 4px; }
+    /* ===== TAKE ===== */
+    .qt { margin-bottom:16px; }
+    .qt h4 { color:var(--green2); font-size:12px; margin-bottom:8px; }
+    .rl { display:flex; align-items:center; gap:8px; padding:7px 11px; border:1px solid var(--border); border-radius:2px; margin-bottom:4px; cursor:pointer; font-size:12px; transition:all .1s; }
+    .rl:hover { border-color:var(--green); color:var(--green); background:var(--green4); }
+    .rl input[type=radio] { accent-color:var(--green); }
+    .rl::before { content:'[ ]'; color:var(--green3); font-size:9px; flex-shrink:0; }
 
     /* ===== RESULTS ===== */
-    .results-table { width: 100%; border-collapse: collapse; font-size: 11px; }
-    .results-table th, .results-table td { padding: 7px 12px; text-align: left; border-bottom: 1px solid var(--border); }
-    .results-table th { color: var(--muted); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; }
-    .results-table td { color: var(--text2); }
-    .results-table td:first-child { color: var(--text); }
-    .chart-wrap { position: relative; height: 180px; }
-    .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; margin-top: 14px; }
+    .rt { width:100%; border-collapse:collapse; font-size:11px; }
+    .rt th,.rt td { padding:6px 10px; text-align:left; border-bottom:1px solid var(--border); }
+    .rt th { color:var(--muted); font-size:9px; letter-spacing:1px; text-transform:uppercase; }
+    .rt td { color:var(--text2); }
+    .rt td:first-child { color:var(--text); }
+    .cg { display:grid; grid-template-columns:1fr 1fr; gap:14px; align-items:start; margin-top:12px; }
+    .cw { position:relative; height:180px; }
+    .br { display:flex; align-items:center; gap:8px; margin-bottom:4px; font-size:10px; }
+    .bl2 { width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--text2); flex-shrink:0; }
+    .bt { flex:1; background:var(--border); height:5px; }
+    .bf { height:100%; background:var(--green); box-shadow:0 0 4px var(--green3); transition:width .5s; }
+    .bc { width:24px; text-align:right; color:var(--muted); font-size:9px; }
 
-    /* ===== LOGIN ===== */
-    .login-wrap {
-      max-width: 420px; margin: 60px auto;
-    }
-    .login-header {
-      font-size: 12px;
-      color: var(--text2);
-      margin-bottom: 20px;
-      padding: 12px;
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-left: 2px solid var(--amber);
-    }
-
-    /* ===== ALERT ===== */
-    .alert { padding: 8px 12px; font-size: 11px; margin-bottom: 12px; display: none; }
-    .alert.show { display: block; }
-    .alert-error   { border: 1px solid var(--red);   color: var(--red);   background: rgba(255,51,51,0.06); border-left: 2px solid var(--red); }
-    .alert-success { border: 1px solid var(--green2); color: var(--green2); background: var(--green4); border-left: 2px solid var(--green); }
-    .alert::before { content: '[ERR] '; }
-    .alert-success::before { content: '[OK]  '; }
+    /* ===== ALERTS ===== */
+    .alert { padding:7px 11px; font-size:11px; margin-bottom:10px; display:none; border-radius:2px; }
+    .alert.show { display:block; }
+    .alert-e { border:1px solid var(--red); border-left:2px solid var(--red); color:var(--red); background:rgba(255,68,68,.04); }
+    .alert-e::before { content:'[ERR]  '; }
+    .alert-s { border:1px solid var(--green2); border-left:2px solid var(--green); color:var(--green2); background:var(--green4); }
+    .alert-s::before { content:'[OK]   '; }
 
     /* ===== MODAL ===== */
-    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 500; align-items: center; justify-content: center; padding: 20px; }
-    .modal-overlay.open { display: flex; }
-    .modal-box { background: var(--bg2); border: 1px solid var(--border2); border-left: 2px solid var(--green); padding: 24px; width: 100%; max-width: 400px; }
-    .modal-title { color: var(--green); font-size: 13px; font-weight: 700; letter-spacing: 2px; margin-bottom: 18px; }
+    .mo { display:none; position:fixed; inset:0; background:rgba(0,0,0,.88); z-index:500; align-items:center; justify-content:center; padding:20px; }
+    .mo.open { display:flex; }
+    .mb { background:var(--bg2); border:1px solid var(--border2); border-left:2px solid var(--green); padding:22px; width:100%; max-width:420px; }
+    .mt { color:var(--green); font-size:12px; font-weight:700; letter-spacing:2px; margin-bottom:16px; }
 
     /* ===== HERO ===== */
-    .hero { padding: 32px 0 24px; }
-    .hero-ascii {
-      font-size: 10px;
-      line-height: 1.2;
-      color: var(--green3);
-      margin-bottom: 16px;
-      white-space: pre;
-      overflow-x: auto;
+    .hero { padding:28px 0 20px; }
+    .ascii { font-size:9px; line-height:1.2; color:var(--green3); white-space:pre; overflow-x:auto; margin-bottom:14px; }
+    .hsys { font-size:10px; color:var(--text2); margin-bottom:4px; }
+    .hsys em { color:var(--green); font-style:normal; }
+    .mission {
+      background:var(--green4); border:1px solid var(--green3); border-left:2px solid var(--green);
+      padding:12px 16px; margin-bottom:16px; font-size:11px; color:var(--text2); line-height:1.7;
     }
-    .hero-sys { font-size: 11px; color: var(--text2); margin-bottom: 6px; }
-    .hero-sys span { color: var(--green); }
-    .hero-cmd { color: var(--muted); font-size: 11px; margin-top: 12px; }
-    .hero-cmd .p { color: var(--green2); }
+    .mission strong { color:var(--green); }
 
-    /* ===== EMPTY ===== */
-    .empty { color: var(--muted); font-size: 11px; padding: 28px 0; text-align: center; }
-    .empty::before { content: '// '; }
+    /* ===== STATS ROW ===== */
+    .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:20px; }
+    .stat { background:var(--surface); border:1px solid var(--border); padding:10px 12px; text-align:center; }
+    .stat-n { font-size:20px; font-weight:700; color:var(--green); line-height:1; }
+    .stat-l { font-size:9px; color:var(--muted); letter-spacing:1px; margin-top:3px; text-transform:uppercase; }
 
-    /* ===== FLEX / MISC ===== */
-    .flex-between { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+    /* ===== CATEGORY FILTER ===== */
+    .filters { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px; }
+
+    /* ===== MISC ===== */
+    .fb { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap; }
+    .br2 { display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
+    .empty { color:var(--muted); font-size:11px; padding:24px 0; text-align:center; }
+    .empty::before { content:'// '; }
+    .cursor { display:inline-block; width:6px; height:11px; background:var(--green); vertical-align:middle; animation:cu 1s step-end infinite; }
+    @keyframes cu { 0%,100%{opacity:1}50%{opacity:0} }
+    hr { border:none; border-top:1px solid var(--border); margin:16px 0; }
+    .deadline-tag { font-size:9px; color:var(--amber); border:1px solid var(--amber); padding:1px 5px; margin-left:6px; }
 
     /* ===== TOAST ===== */
-    #toast {
-      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-      background: var(--green4); border: 1px solid var(--green);
-      color: var(--green); font-family: var(--font); font-size: 11px;
-      padding: 8px 18px; z-index: 9000; opacity: 0;
-      transition: opacity 0.2s; pointer-events: none; white-space: nowrap;
-      box-shadow: 0 0 20px rgba(57,255,20,0.3);
-    }
+    #toast { position:fixed; bottom:18px; left:50%; transform:translateX(-50%); background:var(--green4); border:1px solid var(--green); color:var(--green); font-family:var(--font); font-size:10px; padding:7px 16px; z-index:9000; opacity:0; transition:opacity .2s; pointer-events:none; white-space:nowrap; box-shadow:0 0 20px rgba(57,255,20,.25); letter-spacing:.5px; }
 
-    /* ===== PROGRESS BARS ===== */
-    .bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; font-size: 10px; }
-    .bar-label { width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text2); flex-shrink: 0; }
-    .bar-track { flex: 1; background: var(--border); height: 6px; }
-    .bar-fill  { height: 100%; background: var(--green); transition: width 0.5s; box-shadow: 0 0 4px var(--green3); }
-    .bar-count { width: 28px; text-align: right; color: var(--muted); }
-
-    /* ===== SCROLLBAR ===== */
-    ::-webkit-scrollbar { width: 4px; height: 4px; }
-    ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: var(--green3); }
+    /* ===== IMPACT BANNER ===== */
+    .impact { background:linear-gradient(135deg,rgba(57,255,20,.04),rgba(0,255,204,.04)); border:1px solid var(--border2); border-left:2px solid var(--cyan); padding:14px 18px; margin-bottom:20px; }
+    .impact-title { color:var(--cyan); font-size:11px; font-weight:700; letter-spacing:1px; margin-bottom:6px; }
+    .impact-text  { color:var(--text2); font-size:11px; line-height:1.7; }
 
     /* ===== FOOTER ===== */
-    footer {
-      border-top: 1px solid var(--border);
-      padding: 18px 20px;
-      font-size: 10px;
-      color: var(--muted);
-      margin-top: 48px;
-      letter-spacing: 1px;
-    }
-    footer a { color: var(--green3); text-decoration: none; }
-    footer a:hover { color: var(--green); }
+    footer { border-top:1px solid var(--border); padding:16px 18px; font-size:10px; color:var(--muted); margin-top:48px; letter-spacing:.5px; }
+    footer a { color:var(--green3); text-decoration:none; }
+    footer a:hover { color:var(--green); }
+    .footer-in { max-width:920px; margin:0 auto; display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px; }
 
-    /* ===== DEADLINE BADGE ===== */
-    .deadline-tag { font-size: 10px; color: var(--amber); border: 1px solid var(--amber); padding: 1px 6px; margin-left: 8px; display: inline; }
+    /* ===== LOGIN ===== */
+    .login-wrap { max-width:440px; margin:50px auto; }
+    .access-warn { background:rgba(255,184,0,.05); border:1px solid var(--amber); border-left:2px solid var(--amber); padding:11px 14px; margin-bottom:18px; font-size:11px; color:var(--text2); }
 
-    /* ===== CURSOR ===== */
-    .cursor {
-      display: inline-block; width: 7px; height: 12px;
-      background: var(--green); vertical-align: middle;
-      animation: cur 1s step-end infinite;
+    /* ===== LIGHT MODE ===== */
+    body.lm {
+      --bg:#f0f4f0; --bg2:#e6ece6; --surface:#fff;
+      --border:#c0d4c0; --border2:#a8c8a8;
+      --green:#005500; --green2:#006600; --green3:#448844; --green4:#e0f0e0;
+      --amber:#7a5c00; --red:#cc1100; --cyan:#005544; --purple:#6600cc;
+      --muted:#608060; --text:#182818; --text2:#406040;
     }
-    @keyframes cur { 0%,100%{opacity:1} 50%{opacity:0} }
 
-    /* ===== THEME LIGHT ===== */
-    body.light-mode {
-      --bg:      #f0f4f0; --bg2: #e8ede8; --surface: #ffffff;
-      --border:  #c8d8c8; --border2: #b0c8b0;
-      --green:   #006600; --green2: #007700; --green3: #558855; --green4: #e0f0e0;
-      --amber:   #886600; --red: #cc2200; --cyan: #006666;
-      --muted:   #789078; --text: #1a2e1a; --text2: #4a6a4a;
+    @media(max-width:600px){
+      .ascii { font-size:6px; }
+      .cg { grid-template-columns:1fr; }
+      .stats { grid-template-columns:repeat(2,1fr); }
+      nav { padding:7px 12px; }
     }
-    body.light-mode #bootScreen { background: var(--bg); }
-
-    @media (max-width: 600px) {
-      .hero-ascii { font-size: 7px; }
-      .chart-grid { grid-template-columns: 1fr; }
-      .status-left .hero-sys { display: none; }
-    }
+    ::-webkit-scrollbar { width:3px; height:3px; }
+    ::-webkit-scrollbar-thumb { background:var(--green3); }
   </style>
 </head>
 <body>
 
-<!-- TOAST -->
 <div id="toast"></div>
 
-<!-- ===== BOOT SCREEN ===== -->
-<div id="bootScreen">
-  <div style="width:100%;max-width:600px">
-    <div class="boot-line" style="animation-delay:0s;color:var(--green);font-weight:700;font-size:14px;letter-spacing:3px;margin-bottom:12px">SURVEY_OS v1.0.0 — WAMBUE LEON</div>
-    <div class="boot-line" style="animation-delay:0.2s">[ OK ] Initializing filesystem...</div>
-    <div class="boot-line" style="animation-delay:0.5s">[ OK ] Loading survey modules...</div>
-    <div class="boot-line" style="animation-delay:0.8s">[ OK ] Mounting localStorage...</div>
-    <div class="boot-line" style="animation-delay:1.1s">[ OK ] Importing Chart.js renderer...</div>
-    <div class="boot-line" style="animation-delay:1.4s">[ OK ] Auth system online...</div>
-    <div class="boot-line" style="animation-delay:1.7s">[ OK ] All modules loaded.</div>
-    <div class="boot-line" style="animation-delay:2.0s;color:var(--amber)">READY.</div>
-    <div class="boot-bar" style="margin-top:14px"><div class="boot-bar-fill" id="bootBar"></div></div>
-    <div class="boot-line" style="animation-delay:2.2s;color:var(--muted);font-size:10px;margin-top:8px">Built by Wambue Leon · Nairobi, Kenya · github.com/lnwleon</div>
+<!-- ===== BOOT ===== -->
+<div id="boot">
+  <div style="width:100%;max-width:620px">
+    <div class="bl" style="animation-delay:.0s;color:var(--green);font-size:15px;font-weight:700;letter-spacing:3px;margin-bottom:14px">SURVEY_OS v2.0 // KENYA VOICE PLATFORM</div>
+    <div class="bl" style="animation-delay:.15s">SYS.AUTH  : WAMBUE_LEON :: lnwleon</div>
+    <div class="bl" style="animation-delay:.30s">SYS.NODE  : survey-os.vercel.app</div>
+    <div class="bl" style="animation-delay:.45s">SYS.FOCUS : Kenya tech · youth · SME · health · education</div>
+    <div class="bl" style="animation-delay:.60s">[ OK ] Loading survey modules...</div>
+    <div class="bl" style="animation-delay:.80s">[ OK ] Seeding real Kenya survey data...</div>
+    <div class="bl" style="animation-delay:1.00s">[ OK ] Chart.js renderer online...</div>
+    <div class="bl" style="animation-delay:1.20s">[ OK ] Auth system ready...</div>
+    <div class="bl" style="animation-delay:1.40s;color:var(--amber)">MISSION: Give Kenyan voices a platform. Every response matters.</div>
+    <div class="bbar" style="margin-top:14px"><div class="bfill" id="bfill"></div></div>
+    <div class="bl" style="animation-delay:1.6s;color:var(--muted);font-size:9px;margin-top:6px">Built by Wambue Leon · Nairobi, Kenya · github.com/lnwleon</div>
   </div>
 </div>
 
-<!-- ===== STATUS BAR ===== -->
-<div id="statusBar">
-  <div class="status-left">
-    <div class="status-brand">SURVEY_OS</div>
-    <div class="status-pill"><div class="status-dot"></div><span style="color:var(--green2);font-size:10px">SYS.ONLINE</span></div>
-    <div id="clock"></div>
+<!-- ===== NAV ===== -->
+<nav>
+  <div>
+    <div class="brand">SURVEY_OS <span style="color:var(--text2);font-size:10px;font-weight:400">v2.0</span></div>
+    <sub class="brand" style="font-size:9px;color:var(--text2);display:block;letter-spacing:1px;margin-top:-2px">Kenya Voice Platform</sub>
   </div>
-  <div class="status-right">
-    <span class="status-user" id="navUser"></span>
-    <button class="cmd-btn" id="themeToggle" onclick="toggleTheme()" title="Toggle theme">[ THEME ]</button>
-    <button class="cmd-btn" id="btnRegister"    onclick="openAuthModal('register')">[ REGISTER ]</button>
-    <button class="cmd-btn" id="btnUserLogin"   onclick="openAuthModal('login')">[ LOGIN ]</button>
-    <button class="cmd-btn danger" id="btnUserLogout" style="display:none" onclick="doUserLogout()">[ LOGOUT ]</button>
-    <button class="cmd-btn amber"  id="btnLogin"  onclick="showLogin()">[ ADMIN ]</button>
-    <button class="cmd-btn danger" id="btnLogout" style="display:none" onclick="doLogout()">[ ADMIN OUT ]</button>
+  <div class="nav-r">
+    <span class="dot"></span>
+    <span id="clock" style="font-size:10px"></span>
+    <span id="navUser" style="color:var(--cyan);font-size:10px"></span>
+    <button class="btn" onclick="toggleTheme()" id="themeBtn">[ THEME ]</button>
+    <button class="btn" id="bReg"    onclick="openAuth('register')">[ REGISTER ]</button>
+    <button class="btn" id="bLogin"  onclick="openAuth('login')">[ LOGIN ]</button>
+    <button class="btn danger" id="bOut"  style="display:none" onclick="doUserOut()">[ LOGOUT ]</button>
+    <button class="btn amber"  id="bAdmin" onclick="showPage('pageLogin')">[ ADMIN ]</button>
+    <button class="btn danger" id="bAout"  style="display:none" onclick="doAdminOut()">[ ADMIN OUT ]</button>
   </div>
-</div>
+</nav>
 
-<!-- ===== USER AUTH MODAL ===== -->
-<div class="modal-overlay" id="authModal">
-  <div class="modal-box">
-    <div class="modal-title" id="authModalTitle">// REGISTER NEW USER</div>
-    <div class="alert alert-error"   id="authError"></div>
-    <div class="alert alert-success" id="authSuccess"></div>
-    <div class="form-group" id="authNameGroup">
-      <label class="form-label">Display Name</label>
-      <input class="form-input" type="text" id="authName" placeholder="wambue_leon" />
+<!-- ===== AUTH MODAL ===== -->
+<div class="mo" id="authMo">
+  <div class="mb">
+    <div class="mt" id="authTitle">// REGISTER</div>
+    <div class="alert alert-e" id="authErr"></div>
+    <div class="alert alert-s" id="authOk"></div>
+    <div class="fg" id="nameGrp">
+      <label class="fl">Display Name</label>
+      <input class="fi" type="text" id="aName" placeholder="wambue_leon"/>
     </div>
-    <div class="form-group">
-      <label class="form-label">Email</label>
-      <input class="form-input" type="text" id="authEmail" placeholder="you@example.com" />
+    <div class="fg">
+      <label class="fl">Email</label>
+      <input class="fi" type="text" id="aEmail" placeholder="you@example.com"/>
     </div>
-    <div class="form-group">
-      <label class="form-label">Password</label>
-      <input class="form-input" type="password" id="authPassword" placeholder="••••••••" />
+    <div class="fg">
+      <label class="fl">Password</label>
+      <input class="fi" type="password" id="aPass" placeholder="••••••••"/>
     </div>
-    <div class="btn-row">
-      <button class="cmd-btn primary" id="authSubmitBtn" onclick="submitAuth()">EXECUTE</button>
-      <button class="cmd-btn" onclick="closeAuthModal()">[CANCEL]</button>
+    <div class="br2">
+      <button class="btn primary" id="aSubmit" onclick="submitAuth()">EXECUTE</button>
+      <button class="btn" onclick="closeAuth()">CANCEL</button>
     </div>
-    <div id="authSwitchText" style="margin-top:12px;font-size:10px;color:var(--muted)">
-      Already have an account? <a href="#" onclick="switchAuthMode('login');return false;" style="color:var(--green2)">login here</a>
+    <div id="aSwitch" style="margin-top:10px;font-size:10px;color:var(--muted)">
+      Have an account? <a href="#" onclick="switchAuth('login');return false" style="color:var(--green2)">login here</a>
     </div>
   </div>
 </div>
 
 <!-- ===== HOME ===== -->
 <div class="page active" id="pageHome">
-  <div class="container">
-    <div class="hero">
-      <pre class="hero-ascii">
- ___  _   _  ____  _     _____ _____   ___  ____
-/ __)( ) ( )(  _ \( )   ( ___)( ___ ) / __)/ ___)
-\__ \ ) V (  )   / )   ) )__)  \   /  \__ \\__ \
-(___/ \_/\_/ (_)\_)(____)(_____)(_/(_) (___/(___/</pre>
-      <div class="hero-sys">SYS.NODE : <span>survey_os.local</span> &nbsp;&nbsp; STATUS : <span>200 OK</span> &nbsp;&nbsp; BUILD : <span>wambue-leon/lnwleon</span></div>
-      <div class="hero-sys">UPTIME : <span id="uptime">calculating...</span> &nbsp;&nbsp; RESPONSES : <span id="totalResponses">0</span> &nbsp;&nbsp; SURVEYS : <span id="totalSurveys">0</span></div>
-      <div class="hero-cmd"><span class="p">$</span> ls -la /surveys/ &nbsp;<span class="cursor"></span></div>
-    </div>
+<div class="wrap">
 
-    <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('open')">[ OPEN_SURVEYS ]</button>
-      <button class="tab-btn" onclick="switchTab('closed')">[ RESULTS ]</button>
-      <button class="tab-btn" id="tabAdmin" style="display:none" onclick="switchTab('admin')">[ ADMIN_PANEL ]</button>
-    </div>
-
-    <div id="tabOpen">
-      <div class="section-cmd"><span>$ cat /surveys/open/*</span></div>
-      <div id="openSurveysList"></div>
-    </div>
-    <div id="tabClosed" style="display:none">
-      <div class="section-cmd"><span>$ cat /surveys/closed/* --results</span></div>
-      <div id="closedSurveysList"></div>
-    </div>
-    <div id="tabAdminPanel" style="display:none">
-      <div class="flex-between" style="margin-bottom:16px;align-items:center">
-        <div class="section-cmd" style="margin-bottom:0"><span>$ ls -la /admin/surveys/</span></div>
-        <button class="cmd-btn primary" onclick="showCreateSurvey()">+ NEW_SURVEY</button>
-      </div>
-      <div id="adminSurveysList"></div>
-    </div>
+  <!-- HERO -->
+  <div class="hero">
+    <pre class="ascii">
+ _  _ _  _ _  _ _   _  _       _  _  __  __  __  ____
+( )/ ( )/ ( \( ( ) / )/ )     ( \/ )/  \(  )/ _\(  __)
+ ) \/ ) \/ |\ \|  ) \/ (       )  (( () ) ( /    \) _)
+(_)\_(_)\_(_)\_)(_)\__/         \_)_)\__/(_)\_/\_/(____)
+    </pre>
+    <div class="hsys"><em>SYS.MISSION</em> : Real surveys. Real Kenyan voices. Real impact.</div>
+    <div class="hsys"><em>SYS.FOCUS</em>   : Youth employment · Tech ecosystem · SME challenges · Health · Education</div>
   </div>
+
+  <!-- MISSION STATEMENT -->
+  <div class="mission">
+    <strong>Why this platform exists:</strong> Kenya's youth unemployment sits at ~67% for ages 15–34.
+    Over 80% of new labour market entrants go informal. The tech ecosystem is booming —
+    yet the people inside it rarely get a structured voice. This platform runs real surveys
+    on topics that matter in Kenya right now. <strong>Your responses directly inform community
+    decisions, developer tools, and policy conversations.</strong> Every answer counts.
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat"><div class="stat-n" id="sSurveys">0</div><div class="stat-l">Surveys</div></div>
+    <div class="stat"><div class="stat-n" id="sResponses">0</div><div class="stat-l">Responses</div></div>
+    <div class="stat"><div class="stat-n" id="sOpen">0</div><div class="stat-l">Active Now</div></div>
+    <div class="stat"><div class="stat-n" id="sTopics">5</div><div class="stat-l">Topics</div></div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab on"  onclick="switchTab('open')">📋 OPEN SURVEYS</button>
+    <button class="tab"     onclick="switchTab('closed')">📊 RESULTS</button>
+    <button class="tab"     id="tabAdmin" style="display:none" onclick="switchTab('admin')">⚙ ADMIN</button>
+  </div>
+
+  <!-- OPEN SURVEYS -->
+  <div id="tOpen">
+    <div class="prompt"><span>$ ls -la /surveys/open/ --sort=impact</span></div>
+
+    <!-- CATEGORY FILTER -->
+    <div class="filters" id="catFilters">
+      <button class="btn on" data-cat="all"    onclick="filterCat('all')">ALL</button>
+      <button class="btn cyan"   data-cat="tech"   onclick="filterCat('tech')">TECH</button>
+      <button class="btn amber"  data-cat="youth"  onclick="filterCat('youth')">YOUTH</button>
+      <button class="btn purple" data-cat="sme"    onclick="filterCat('sme')">SME</button>
+      <button class="btn danger" data-cat="health" onclick="filterCat('health')">HEALTH</button>
+      <button class="btn"        data-cat="edu"    onclick="filterCat('edu')">EDUCATION</button>
+    </div>
+
+    <div id="openList"></div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="tClosed" style="display:none">
+    <div class="prompt"><span>$ cat /surveys/closed/* --aggregate</span></div>
+    <div id="closedList"></div>
+  </div>
+
+  <!-- ADMIN -->
+  <div id="tAdmin" style="display:none">
+    <div class="fb" style="margin-bottom:14px;align-items:center">
+      <div class="prompt" style="margin:0"><span>$ ls -la /admin/surveys/</span></div>
+      <button class="btn primary" onclick="showCreate()">+ NEW_SURVEY</button>
+    </div>
+    <div id="adminList"></div>
+  </div>
+
+</div>
 </div>
 
 <!-- ===== ADMIN LOGIN ===== -->
 <div class="page" id="pageLogin">
-  <div class="container">
-    <div class="login-wrap">
-      <div class="login-header">
-        <div style="color:var(--amber);font-size:10px;letter-spacing:2px;margin-bottom:6px">// ACCESS RESTRICTED</div>
-        <div style="font-size:11px;color:var(--text2)">Coordinator authentication required to access admin panel.</div>
+<div class="wrap">
+  <div class="login-wrap">
+    <div class="prompt"><span>$ sudo login --role=coordinator</span></div>
+    <div class="access-warn">
+      <div style="color:var(--amber);font-size:9px;letter-spacing:2px;margin-bottom:4px">// RESTRICTED ACCESS</div>
+      Coordinator credentials required. You can create, open, close, and delete surveys.
+    </div>
+    <div class="card">
+      <div class="alert alert-e" id="loginErr">Authentication failed.</div>
+      <div class="fg"><label class="fl">Username</label><input class="fi" type="text" id="lu" placeholder="admin"/></div>
+      <div class="fg"><label class="fl">Password</label><input class="fi" type="password" id="lp" placeholder="••••••••"/></div>
+      <div class="br2">
+        <button class="btn primary" onclick="doLogin()">AUTHENTICATE</button>
+        <button class="btn" onclick="showPage('pageHome')">CANCEL</button>
       </div>
-      <div class="alert alert-error" id="loginError">Authentication failed. Check credentials.</div>
-      <div class="term-block">
-        <div class="section-cmd" style="margin-bottom:14px"><span>$ sudo login --role=coordinator</span></div>
-        <div class="form-group">
-          <label class="form-label">Username</label>
-          <input class="form-input" type="text" id="loginUser" placeholder="coordinator" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Password</label>
-          <input class="form-input" type="password" id="loginPass" placeholder="••••••••" />
-        </div>
-        <div class="btn-row">
-          <button class="cmd-btn primary" onclick="doLogin()">AUTHENTICATE</button>
-          <button class="cmd-btn" onclick="showPage('pageHome')">CANCEL</button>
-        </div>
-        <div style="margin-top:14px;font-size:10px;color:var(--muted)">// demo: admin / admin123</div>
-      </div>
+      <div style="margin-top:12px;font-size:9px;color:var(--muted)">// demo: admin / admin123</div>
     </div>
   </div>
+</div>
 </div>
 
 <!-- ===== CREATE SURVEY ===== -->
 <div class="page" id="pageCreate">
-  <div class="container">
-    <div class="section-cmd"><span>$ nano /surveys/new.survey</span></div>
-    <div class="alert alert-error" id="createError"></div>
-    <div class="term-block">
-      <div class="form-group">
-        <label class="form-label">Survey Title</label>
-        <input class="form-input" type="text" id="surveyTitle" placeholder="e.g. Customer Satisfaction Survey" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Deadline (optional — auto-closes at this time)</label>
-        <input class="form-input" type="datetime-local" id="surveyDeadline" />
-      </div>
-      <div style="font-size:10px;color:var(--muted);margin-bottom:14px;letter-spacing:1px">// QUESTIONS [max 10]</div>
-      <div id="questionsContainer"></div>
-      <div class="btn-row">
-        <button class="cmd-btn" onclick="addQuestion()">+ ADD_QUESTION</button>
-      </div>
+<div class="wrap">
+  <div class="prompt"><span>$ nano /surveys/new.survey</span></div>
+  <div class="alert alert-e" id="createErr"></div>
+  <div class="card">
+    <div class="fg"><label class="fl">Survey Title</label><input class="fi" type="text" id="svTitle" placeholder="e.g. Kenya Developer Salary Survey 2025"/></div>
+    <div class="fg">
+      <label class="fl">Category</label>
+      <select class="fi" id="svCat">
+        <option value="tech">Tech / Developer</option>
+        <option value="youth">Youth / Employment</option>
+        <option value="sme">SME / Business</option>
+        <option value="health">Health</option>
+        <option value="edu">Education</option>
+      </select>
     </div>
-    <div class="btn-row">
-      <button class="cmd-btn primary" onclick="saveSurvey()">WRITE_FILE</button>
-      <button class="cmd-btn" onclick="showPage('pageHome')">DISCARD</button>
-    </div>
+    <div class="fg"><label class="fl">Purpose / Why this survey matters</label><input class="fi" type="text" id="svPurpose" placeholder="e.g. To understand salary gaps in Kenya's tech sector"/></div>
+    <div class="fg"><label class="fl">Deadline (optional — auto-closes)</label><input class="fi" type="datetime-local" id="svDeadline"/></div>
+    <hr/>
+    <div style="font-size:9px;color:var(--muted);letter-spacing:1px;margin-bottom:10px">// QUESTIONS [max 10 · min 1]</div>
+    <div id="qContainer"></div>
+    <div class="br2"><button class="btn" onclick="addQ()">+ ADD_QUESTION</button></div>
   </div>
+  <div class="br2">
+    <button class="btn primary" onclick="saveSurvey()">WRITE_FILE</button>
+    <button class="btn" onclick="showPage('pageHome')">DISCARD</button>
+  </div>
+</div>
 </div>
 
 <!-- ===== TAKE SURVEY ===== -->
 <div class="page" id="pageTake">
-  <div class="container"><div id="takeSurveyContent"></div></div>
+<div class="wrap"><div id="takeContent"></div></div>
 </div>
 
-<!-- ===== VIEW RESULTS ===== -->
+<!-- ===== RESULTS PAGE ===== -->
 <div class="page" id="pageResults">
-  <div class="container"><div id="resultsContent"></div></div>
+<div class="wrap"><div id="resultsContent"></div></div>
 </div>
 
 <!-- ===== FOOTER ===== -->
 <footer>
-  <div style="max-width:900px;margin:0 auto;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px">
-    <span>SURVEY_OS v1.0 // Built by <a href="https://github.com/lnwleon" target="_blank">Wambue Leon</a> — Nairobi, Kenya — 2025</span>
-    <span><a href="https://github.com/florinpop17/app-ideas/blob/master/Projects/3-Advanced/Survey-App.md" target="_blank">[ App Idea Source ]</a> &nbsp; <a href="https://github.com/lnwleon/survey-app" target="_blank">[ GitHub Repo ]</a></span>
+  <div class="footer-in">
+    <span>SURVEY_OS v2.0 // Kenya Voice Platform &nbsp;·&nbsp; Built by <a href="https://github.com/lnwleon" target="_blank">Wambue Leon</a> &nbsp;·&nbsp; Nairobi, Kenya &nbsp;·&nbsp; 2025</span>
+    <span><a href="https://github.com/lnwleon/survey-app" target="_blank">[ GitHub ]</a> &nbsp; <a href="https://github.com/florinpop17/app-ideas/blob/master/Projects/3-Advanced/Survey-App.md" target="_blank">[ Project Source ]</a></span>
   </div>
 </footer>
 
 <script>
 // ============================================================
-// STATE & PERSISTENCE
+// REAL KENYA SURVEYS — pre-seeded data
 // ============================================================
-const state = {
+const SEED_SURVEYS = [
+  {
+    id: 'ks_tech_001',
+    title: 'Kenya Developer Ecosystem Survey 2025',
+    category: 'tech',
+    purpose: 'To understand the real challenges, salary ranges, and opportunities for developers in Kenya\'s Silicon Savannah.',
+    status: 'open',
+    responses: [],
+    createdAt: new Date(Date.now() - 7 * 86400000).toISOString(),
+    deadline: null,
+    seeded: true,
+    questions: [
+      { text: 'How long have you been writing code professionally?', choices: ['Less than 1 year', '1–3 years', '3–5 years', '5–10 years', 'More than 10 years'] },
+      { text: 'What is your current employment status as a developer in Kenya?', choices: ['Full-time employed (local company)', 'Full-time employed (foreign/remote)', 'Freelancing / contract', 'Running my own startup', 'Unemployed / job searching'] },
+      { text: 'What is your approximate monthly income from tech work (KES)?', choices: ['Below 30,000', '30,000–60,000', '60,000–120,000', '120,000–250,000', 'Above 250,000'] },
+      { text: 'What is the BIGGEST challenge you face as a developer in Kenya?', choices: ['Finding well-paying clients/jobs', 'Unreliable internet / power cuts', 'Lack of mentorship and community', 'Access to funding / investment', 'Skills gap / keeping up with tech'] },
+      { text: 'Which tech hub or community are you most active in?', choices: ['iHub Nairobi', 'Nailab', 'JKUAT / University community', 'Moringa School community', 'Online only (no physical hub)'] },
+      { text: 'Do you believe Kenya\'s tech sector provides fair opportunities regardless of background?', choices: ['Yes, it is quite fair', 'Somewhat — improving slowly', 'No — connections matter more than skill', 'No — gender gap is significant', 'No — county of origin matters too much'] },
+      { text: 'What type of project are you most interested in building or working on?', choices: ['Fintech / M-Pesa integrations', 'AgriTech / rural solutions', 'HealthTech', 'EdTech / e-learning', 'AI / machine learning tools'] },
+    ]
+  },
+  {
+    id: 'ks_youth_001',
+    title: 'Kenya Youth Employment & Skills Gap Survey',
+    category: 'youth',
+    purpose: 'Youth aged 15–34 face 67% unemployment. This survey maps real barriers and what young Kenyans actually need to get hired.',
+    status: 'open',
+    responses: [],
+    createdAt: new Date(Date.now() - 5 * 86400000).toISOString(),
+    deadline: null,
+    seeded: true,
+    questions: [
+      { text: 'What is your age group?', choices: ['15–19 years', '20–24 years', '25–29 years', '30–34 years', '35+ years'] },
+      { text: 'What is your current employment / education status?', choices: ['In school / college / university', 'Graduate — employed', 'Graduate — unemployed / job searching', 'Self-employed / hustling', 'Neither employed nor in school'] },
+      { text: 'What is the biggest barrier stopping you from getting a good job?', choices: ['No relevant skills / training', 'Employers require experience I don\'t have', 'No connections or network (who you know)', 'Jobs available don\'t pay enough to survive', 'There are no jobs in my area / county'] },
+      { text: 'Which skill do you most want to learn to improve your employment chances?', choices: ['Digital / tech skills (coding, design, data)', 'Business / entrepreneurship skills', 'Vocational / trade skills (plumbing, electrical, etc)', 'Soft skills (communication, leadership)', 'Financial literacy / money management'] },
+      { text: 'Have you ever used a government youth employment programme (YEDF, Kazi Mtaani, etc.)?', choices: ['Yes — it helped significantly', 'Yes — but it had minimal impact', 'I tried to access it but couldn\'t', 'No — not aware of what\'s available', 'No — I don\'t trust government programmes'] },
+      { text: 'How do you currently make money or try to make money?', choices: ['Formal employment (salary/wages)', 'Casual labour / day jobs', 'Online work (freelancing, gig economy)', 'Small business / hawking', 'I depend on family support'] },
+      { text: 'If you had free training available tomorrow, which would you choose?', choices: ['Software development / coding', 'Graphic design / digital art', 'Content creation / social media marketing', 'Accounting / bookkeeping', 'Electrical / solar installation'] },
+    ]
+  },
+  {
+    id: 'ks_sme_001',
+    title: 'Kenya SME Digital Adoption Survey',
+    category: 'sme',
+    purpose: 'Small businesses power Kenya\'s economy. This survey maps which digital tools SMEs use, which they need, and what holds them back.',
+    status: 'open',
+    responses: [],
+    createdAt: new Date(Date.now() - 3 * 86400000).toISOString(),
+    deadline: null,
+    seeded: true,
+    questions: [
+      { text: 'What type of business do you operate?', choices: ['Retail shop / duka', 'Food & hospitality (restaurant, hotel, catering)', 'Salon / barbershop / beauty', 'Hardware / construction materials', 'Pharmacy / chemist', 'Other service business'] },
+      { text: 'How do you currently handle your business finances / bookkeeping?', choices: ['Paper notebook / handwritten records', 'Excel / Google Sheets', 'A bookkeeping app (e.g. Wave, QuickBooks)', 'I don\'t keep formal records', 'I have an accountant who handles it'] },
+      { text: 'How do most of your customers pay you?', choices: ['M-Pesa (most common)', 'Cash only', 'Mix of cash and M-Pesa', 'Bank transfer / card', 'Credit / buy now pay later'] },
+      { text: 'What is the biggest tech or digital challenge in your business?', choices: ['I don\'t know which tools to use', 'Internet is too expensive or unreliable', 'Devices (phone/computer) are too expensive', 'I lack skills to use digital tools', 'I can\'t afford paid software subscriptions'] },
+      { text: 'Which digital tool would help your business the MOST?', choices: ['Simple stock / inventory tracker', 'Customer records and debt tracking', 'Online presence (website / Google Maps)', 'Easy mobile payment and invoicing', 'Business loan / credit access'] },
+      { text: 'Have you ever applied for a business loan or credit to grow your business?', choices: ['Yes — I got it and it helped', 'Yes — but I was rejected', 'Yes — the interest rates were too high', 'No — I didn\'t know how to apply', 'No — I\'m afraid of debt'] },
+      { text: 'Would you use a free simple bookkeeping app designed specifically for Kenyan SMEs?', choices: ['Yes — definitely, I need one now', 'Yes — if it worked on my phone offline', 'Maybe — depends on how easy it is', 'No — I prefer my current method', 'No — I don\'t trust apps with my business data'] },
+    ]
+  },
+  {
+    id: 'ks_health_001',
+    title: 'Kenya Youth Mental Health & Wellbeing Survey',
+    category: 'health',
+    purpose: 'Mental health is underdiscussed in Kenya. This survey helps understand awareness, access, and barriers to support among young Kenyans.',
+    status: 'open',
+    responses: [],
+    createdAt: new Date(Date.now() - 2 * 86400000).toISOString(),
+    deadline: null,
+    seeded: true,
+    questions: [
+      { text: 'How would you rate your current mental wellbeing?', choices: ['Very good — I feel balanced and well', 'Good — mostly okay with some stress', 'Fair — struggling but managing', 'Poor — I am really struggling', 'I don\'t know / I haven\'t thought about it'] },
+      { text: 'What is the BIGGEST source of stress or anxiety in your life right now?', choices: ['Financial pressure / unemployment', 'Academic performance / school pressure', 'Family or relationship issues', 'Health worries (my own or family\'s)', 'General uncertainty about the future'] },
+      { text: 'If you were struggling mentally, who would you most likely turn to first?', choices: ['A close friend or peer', 'A family member / parent', 'A religious leader (pastor, imam)', 'A professional counsellor or therapist', 'I would handle it alone'] },
+      { text: 'Is mental health openly discussed in your community or family?', choices: ['Yes — we talk about it openly', 'Somewhat — only with close friends', 'Rarely — it\'s seen as taboo', 'No — mental illness is stigmatised', 'No — it\'s linked to witchcraft / superstition'] },
+      { text: 'Are you aware of any free or affordable mental health services in Kenya?', choices: ['Yes — I have used them', 'Yes — but I haven\'t used them', 'I\'ve heard of some but don\'t know details', 'No — I\'m not aware of any', 'No — and I don\'t think they exist'] },
+    ]
+  },
+  {
+    id: 'ks_edu_001',
+    title: 'Kenya TVET & Digital Skills Education Survey',
+    category: 'edu',
+    purpose: 'Are Kenya\'s TVET colleges and tech training programs meeting the needs of students and the job market? Help us find out.',
+    status: 'open',
+    responses: [],
+    createdAt: new Date(Date.now() - 1 * 86400000).toISOString(),
+    deadline: null,
+    seeded: true,
+    questions: [
+      { text: 'What is your highest level of education completed?', choices: ['Primary school (KCPE level)', 'Secondary school (KCSE level)', 'Certificate / Diploma (TVET/College)', 'University degree', 'Postgraduate (Masters / PhD)'] },
+      { text: 'How relevant is your education to the work you do or want to do?', choices: ['Very relevant — my training matches the work', 'Somewhat relevant — some skills apply', 'Mostly irrelevant — I learned on the job', 'Completely irrelevant — different field', 'Still studying — cannot judge yet'] },
+      { text: 'What is the biggest gap in Kenya\'s education system for tech and employment?', choices: ['Not enough practical / hands-on training', 'Curriculum is outdated (teaches old skills)', 'Too expensive / not accessible for poor students', 'No link between colleges and employers', 'Too much theory, too little real-world projects'] },
+      { text: 'Have you or would you consider online learning to gain skills (Coursera, YouTube, etc.)?', choices: ['Yes — I actively learn online now', 'Yes — I want to but struggle with data costs', 'Yes — but I need structure, not self-paced', 'No — I prefer classroom/physical training', 'No — I don\'t trust online certificates'] },
+      { text: 'What would most improve TVET/tech education in Kenya?', choices: ['Industry partnerships and internship placements', 'Cheaper or subsidised tuition fees', 'Updated curriculum with AI and modern tech', 'More female-focused tech programmes', 'Better equipped labs and internet access'] },
+    ]
+  }
+];
+
+// ============================================================
+// STATE
+// ============================================================
+const S = {
   isAdmin: false,
-  currentUser: null,
-  currentTab: 'open',
-  editingSurveyId: null,
-  surveys: JSON.parse(localStorage.getItem('wl_surveys') || '[]'),
+  user: null,
+  tab: 'open',
+  editId: null,
+  catFilter: 'all',
+  surveys: [],
   bootTime: Date.now(),
 };
 
-function save()           { localStorage.setItem('wl_surveys', JSON.stringify(state.surveys)); }
-function getUsers()       { return JSON.parse(localStorage.getItem('wl_users') || '[]'); }
-function saveUsers(u)     { localStorage.setItem('wl_users', JSON.stringify(u)); }
+function save() { localStorage.setItem('wl_surveys_v2', JSON.stringify(S.surveys)); }
+function getUsers()    { return JSON.parse(localStorage.getItem('wl_users_v2') || '[]'); }
+function saveUsers(u)  { localStorage.setItem('wl_users_v2', JSON.stringify(u)); }
+
+function initSurveys() {
+  const stored = JSON.parse(localStorage.getItem('wl_surveys_v2') || '[]');
+  // Merge stored responses into seeds; add any non-seeded user surveys
+  S.surveys = SEED_SURVEYS.map(seed => {
+    const found = stored.find(s => s.id === seed.id);
+    return found ? { ...seed, responses: found.responses, status: found.status } : { ...seed };
+  });
+  // Add any user-created (non-seeded) surveys
+  stored.filter(s => !s.seeded).forEach(s => S.surveys.push(s));
+  save();
+}
 
 // ============================================================
-// BOOT SEQUENCE
+// BOOT
 // ============================================================
 (function boot() {
-  const bar = document.getElementById('bootBar');
-  let pct = 0;
+  initSurveys();
+  const fill = document.getElementById('bfill');
+  let p = 0;
   const iv = setInterval(() => {
-    pct += Math.random() * 18 + 4;
-    bar.style.width = Math.min(pct, 100) + '%';
-    if (pct >= 100) {
+    p += Math.random() * 15 + 5;
+    fill.style.width = Math.min(p, 100) + '%';
+    if (p >= 100) {
       clearInterval(iv);
-      setTimeout(() => {
-        document.getElementById('bootScreen').classList.add('hidden');
-        renderHome();
-      }, 400);
+      setTimeout(() => { document.getElementById('boot').classList.add('gone'); renderHome(); }, 350);
     }
-  }, 80);
+  }, 60);
 })();
 
 // ============================================================
-// CLOCK + UPTIME
+// CLOCK
 // ============================================================
-function padZ(n) { return String(n).padStart(2,'0'); }
-function updateClock() {
-  const now = new Date();
-  document.getElementById('clock').textContent =
-    padZ(now.getHours()) + ':' + padZ(now.getMinutes()) + ':' + padZ(now.getSeconds());
-  const up = Math.floor((Date.now() - state.bootTime) / 1000);
-  const m = Math.floor(up / 60), s = up % 60;
-  const el = document.getElementById('uptime');
-  if (el) el.textContent = padZ(m) + 'm ' + padZ(s) + 's';
+function z(n) { return String(n).padStart(2,'0'); }
+function tick() {
+  const t = new Date();
+  document.getElementById('clock').textContent = z(t.getHours())+':'+z(t.getMinutes())+':'+z(t.getSeconds());
 }
-setInterval(updateClock, 1000);
-updateClock();
+setInterval(tick, 1000); tick();
 
 // ============================================================
 // PAGE ROUTING
@@ -667,30 +647,28 @@ function showPage(id) {
   document.getElementById(id).classList.add('active');
   window.scrollTo(0,0);
 }
-function showLogin() { showPage('pageLogin'); }
-function showHome()  { renderHome(); showPage('pageHome'); }
+function showHome() { renderHome(); showPage('pageHome'); }
 
 // ============================================================
 // ADMIN AUTH
 // ============================================================
-const ADMIN = { user: 'admin', pass: 'admin123' };
 function doLogin() {
-  const u = document.getElementById('loginUser').value.trim();
-  const p = document.getElementById('loginPass').value;
-  if (u === ADMIN.user && p === ADMIN.pass) {
-    state.isAdmin = true;
-    document.getElementById('btnLogin').style.display  = 'none';
-    document.getElementById('btnLogout').style.display = '';
-    document.getElementById('tabAdmin').style.display  = '';
-    document.getElementById('loginError').classList.remove('show');
+  const u = document.getElementById('lu').value.trim();
+  const p = document.getElementById('lp').value;
+  if (u==='admin' && p==='admin123') {
+    S.isAdmin = true;
+    document.getElementById('bAdmin').style.display = 'none';
+    document.getElementById('bAout').style.display  = '';
+    document.getElementById('tabAdmin').style.display = '';
+    document.getElementById('loginErr').classList.remove('show');
     showHome(); switchTab('admin');
-  } else { document.getElementById('loginError').classList.add('show'); }
+  } else { document.getElementById('loginErr').classList.add('show'); }
 }
-function doLogout() {
-  state.isAdmin = false;
-  document.getElementById('btnLogin').style.display  = '';
-  document.getElementById('btnLogout').style.display = 'none';
-  document.getElementById('tabAdmin').style.display  = 'none';
+function doAdminOut() {
+  S.isAdmin = false;
+  document.getElementById('bAdmin').style.display = '';
+  document.getElementById('bAout').style.display  = 'none';
+  document.getElementById('tabAdmin').style.display = 'none';
   showHome(); switchTab('open');
 }
 
@@ -698,113 +676,152 @@ function doLogout() {
 // USER AUTH
 // ============================================================
 let authMode = 'register';
-function openAuthModal(mode) {
-  authMode = mode;
-  document.getElementById('authModal').classList.add('open');
-  ['authError','authSuccess'].forEach(id => document.getElementById(id).classList.remove('show'));
-  ['authEmail','authPassword','authName'].forEach(id => document.getElementById(id).value = '');
-  switchAuthMode(mode);
+function openAuth(mode) { authMode=mode; document.getElementById('authMo').classList.add('open'); resetAuth(); switchAuth(mode); }
+function closeAuth()  { document.getElementById('authMo').classList.remove('open'); }
+function resetAuth()  {
+  ['authErr','authOk'].forEach(id => document.getElementById(id).classList.remove('show'));
+  ['aName','aEmail','aPass'].forEach(id => document.getElementById(id).value='');
 }
-function closeAuthModal() { document.getElementById('authModal').classList.remove('open'); }
-function switchAuthMode(mode) {
+function switchAuth(mode) {
   authMode = mode;
-  const r = mode === 'register';
-  document.getElementById('authModalTitle').textContent   = r ? '// REGISTER NEW USER' : '// USER LOGIN';
-  document.getElementById('authSubmitBtn').textContent    = 'EXECUTE';
-  document.getElementById('authNameGroup').style.display  = r ? '' : 'none';
-  document.getElementById('authSwitchText').innerHTML     = r
-    ? 'Already registered? <a href="#" onclick="switchAuthMode(\'login\');return false;" style="color:var(--green2)">login here</a>'
-    : 'Need an account? <a href="#" onclick="switchAuthMode(\'register\');return false;" style="color:var(--green2)">register here</a>';
+  const r = mode==='register';
+  document.getElementById('authTitle').textContent      = r ? '// REGISTER' : '// LOGIN';
+  document.getElementById('nameGrp').style.display      = r ? '' : 'none';
+  document.getElementById('aSwitch').innerHTML          = r
+    ? 'Have an account? <a href="#" onclick="switchAuth(\'login\');return false" style="color:var(--green2)">login here</a>'
+    : 'No account? <a href="#" onclick="switchAuth(\'register\');return false" style="color:var(--green2)">register here</a>';
 }
 function submitAuth() {
-  const errEl = document.getElementById('authError'), okEl = document.getElementById('authSuccess');
+  const errEl = document.getElementById('authErr'), okEl = document.getElementById('authOk');
   errEl.classList.remove('show'); okEl.classList.remove('show');
-  const email = document.getElementById('authEmail').value.trim().toLowerCase();
-  const pass  = document.getElementById('authPassword').value;
-  const name  = document.getElementById('authName').value.trim();
-  if (!email || !pass) { errEl.textContent = 'Email and password required.'; errEl.classList.add('show'); return; }
+  const email = document.getElementById('aEmail').value.trim().toLowerCase();
+  const pass  = document.getElementById('aPass').value;
+  const name  = document.getElementById('aName').value.trim();
+  if (!email||!pass) { errEl.textContent='Email and password required.'; errEl.classList.add('show'); return; }
   const users = getUsers();
-  if (authMode === 'register') {
-    if (!name) { errEl.textContent = 'Display name required.'; errEl.classList.add('show'); return; }
-    if (users.find(u => u.email === email)) { errEl.textContent = 'Email already registered.'; errEl.classList.add('show'); return; }
-    const nu = { id:'u_'+Date.now(), name, email, pass, completedSurveys:[] };
-    users.push(nu); saveUsers(users); setCurrentUser(nu);
-    okEl.textContent = 'Account created. Welcome, ' + name + '.';
-    okEl.classList.add('show'); setTimeout(closeAuthModal, 1200);
+  if (authMode==='register') {
+    if (!name) { errEl.textContent='Display name required.'; errEl.classList.add('show'); return; }
+    if (users.find(u=>u.email===email)) { errEl.textContent='Email already registered.'; errEl.classList.add('show'); return; }
+    const nu = {id:'u_'+Date.now(), name, email, pass, completedSurveys:[]};
+    users.push(nu); saveUsers(users); setUser(nu);
+    okEl.textContent='Account created. Welcome, '+name+'.'; okEl.classList.add('show');
+    setTimeout(closeAuth, 1300);
   } else {
-    const u = users.find(u => u.email===email && u.pass===pass);
-    if (!u) { errEl.textContent = 'Invalid email or password.'; errEl.classList.add('show'); return; }
-    setCurrentUser(u); closeAuthModal();
+    const u = users.find(u=>u.email===email && u.pass===pass);
+    if (!u) { errEl.textContent='Invalid email or password.'; errEl.classList.add('show'); return; }
+    setUser(u); closeAuth();
   }
 }
-function setCurrentUser(user) {
-  state.currentUser = user;
-  document.getElementById('navUser').textContent         = '[ ' + user.name.toUpperCase() + ' ]';
-  document.getElementById('btnRegister').style.display   = 'none';
-  document.getElementById('btnUserLogin').style.display  = 'none';
-  document.getElementById('btnUserLogout').style.display = '';
+function setUser(u) {
+  S.user = u;
+  document.getElementById('navUser').textContent     = '[ '+u.name.toUpperCase()+' ]';
+  document.getElementById('bReg').style.display      = 'none';
+  document.getElementById('bLogin').style.display    = 'none';
+  document.getElementById('bOut').style.display      = '';
   renderHome();
 }
-function doUserLogout() {
-  state.currentUser = null;
-  document.getElementById('navUser').textContent         = '';
-  document.getElementById('btnRegister').style.display   = '';
-  document.getElementById('btnUserLogin').style.display  = '';
-  document.getElementById('btnUserLogout').style.display = 'none';
+function doUserOut() {
+  S.user = null;
+  document.getElementById('navUser').textContent  = '';
+  document.getElementById('bReg').style.display   = '';
+  document.getElementById('bLogin').style.display = '';
+  document.getElementById('bOut').style.display   = 'none';
   renderHome();
+}
+
+// ============================================================
+// CATEGORY FILTER
+// ============================================================
+let activeCat = 'all';
+function filterCat(cat) {
+  activeCat = cat;
+  document.querySelectorAll('#catFilters .btn').forEach(b => b.classList.remove('on'));
+  document.querySelector('[data-cat="'+cat+'"]')?.classList.add('on');
+  renderOpenSurveys();
 }
 
 // ============================================================
 // TABS
 // ============================================================
 function switchTab(tab) {
-  state.currentTab = tab;
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  ['open','closed','admin'].forEach((t,i) => {
-    if (t === tab) document.querySelectorAll('.tab-btn')[i]?.classList.add('active');
+  S.tab = tab;
+  document.querySelectorAll('.tab').forEach((b,i) => {
+    b.classList.toggle('on', ['open','closed','admin'][i]===tab);
   });
-  document.getElementById('tabOpen').style.display       = tab==='open'   ? '' : 'none';
-  document.getElementById('tabClosed').style.display     = tab==='closed' ? '' : 'none';
-  document.getElementById('tabAdminPanel').style.display = tab==='admin'  ? '' : 'none';
+  document.getElementById('tOpen').style.display   = tab==='open'   ? '' : 'none';
+  document.getElementById('tClosed').style.display = tab==='closed' ? '' : 'none';
+  document.getElementById('tAdmin').style.display  = tab==='admin'  ? '' : 'none';
   renderHome();
+}
+
+// ============================================================
+// STATS
+// ============================================================
+function updateStats() {
+  const open = S.surveys.filter(s=>s.status==='open').length;
+  const resp = S.surveys.reduce((a,s)=>a+s.responses.length,0);
+  document.getElementById('sSurveys').textContent   = S.surveys.length;
+  document.getElementById('sResponses').textContent = resp;
+  document.getElementById('sOpen').textContent      = open;
 }
 
 // ============================================================
 // HOME RENDER
 // ============================================================
 function renderHome() {
-  checkDeadlines();
-  // stats
-  const tS = document.getElementById('totalSurveys');
-  const tR = document.getElementById('totalResponses');
-  if (tS) tS.textContent = state.surveys.length;
-  if (tR) tR.textContent = state.surveys.reduce((a,s) => a + s.responses.length, 0);
-  renderOpenSurveys();
-  renderClosedSurveys();
-  if (state.isAdmin) renderAdminSurveys();
+  checkDeadlines(); updateStats();
+  renderOpenSurveys(); renderClosedSurveys();
+  if (S.isAdmin) renderAdminSurveys();
 }
 
+// ============================================================
+// CATEGORY LABEL + COLOR
+// ============================================================
+function catInfo(cat) {
+  const map = {
+    tech:   { label:'TECH',      cls:'badge-tech',   card:'cat-tech'   },
+    youth:  { label:'YOUTH',     cls:'badge-youth',  card:'cat-youth'  },
+    sme:    { label:'SME',       cls:'badge-sme',    card:'cat-sme'    },
+    health: { label:'HEALTH',    cls:'badge-health', card:'cat-health' },
+    edu:    { label:'EDUCATION', cls:'badge-edu',    card:'cat-edu'    },
+  };
+  return map[cat] || { label: cat.toUpperCase(), cls:'', card:'' };
+}
+
+// ============================================================
+// RENDER OPEN SURVEYS
+// ============================================================
 function renderOpenSurveys() {
-  const el = document.getElementById('openSurveysList');
-  const open = state.surveys.filter(s => s.status === 'open');
-  if (!open.length) { el.innerHTML = '<div class="empty">no open surveys found in /surveys/open/</div>'; return; }
-  el.innerHTML = open.map(s => {
-    const dlTag = s.deadline ? '<span class="deadline-tag">⏰ ' + new Date(s.deadline).toLocaleString() + '</span>' : '';
-    const done  = state.currentUser && (() => {
-      const u = getUsers().find(x => x.id === state.currentUser.id);
+  const el = document.getElementById('openList');
+  let surveys = S.surveys.filter(s=>s.status==='open');
+  if (activeCat !== 'all') surveys = surveys.filter(s=>s.category===activeCat);
+  if (!surveys.length) { el.innerHTML='<div class="empty">no open surveys in this category</div>'; return; }
+
+  el.innerHTML = surveys.map(s => {
+    const ci = catInfo(s.category);
+    const dlTag = s.deadline ? '<span class="deadline-tag">⏰ '+new Date(s.deadline).toLocaleString()+'</span>' : '';
+    const done = S.user && (() => {
+      const u = getUsers().find(x=>x.id===S.user.id);
       return u && u.completedSurveys && u.completedSurveys.includes(s.id);
     })();
     const takeBtn = done
-      ? '<span style="color:var(--green2);font-size:10px;letter-spacing:1px">[ ✓ COMPLETED ]</span>'
-      : '<button class="cmd-btn primary" onclick="startTake(\'' + s.id + '\')">OPEN_FILE</button>';
-    return `<div class="term-block">
-      <div class="term-header">
-        <div>
-          <div class="term-title">${esc(s.title)}<span class="badge badge-open">OPEN</span>${dlTag}</div>
-          <div class="term-meta">${s.questions.length} question(s) &nbsp;·&nbsp; ${s.responses.length} response(s) &nbsp;·&nbsp; created ${new Date(s.createdAt).toLocaleDateString()}</div>
+      ? '<span style="color:var(--green2);font-size:9px;letter-spacing:1px">[ ✓ RESPONDED ]</span>'
+      : '<button class="btn primary" onclick="startTake(\''+s.id+'\')">TAKE SURVEY</button>';
+
+    return `<div class="card ${ci.card}">
+      <div class="card-head">
+        <div style="flex:1">
+          <div class="card-title">
+            ${esc(s.title)}
+            <span class="badge ${ci.cls}">${ci.label}</span>
+            <span class="badge badge-open">OPEN</span>
+            ${dlTag}
+          </div>
+          ${s.purpose ? '<div style="font-size:11px;color:var(--text2);margin:5px 0 6px;line-height:1.6">'+ esc(s.purpose) +'</div>' : ''}
+          <div class="card-meta">${s.questions.length} questions &nbsp;·&nbsp; ${s.responses.length} responses so far &nbsp;·&nbsp; ${timeSince(s.createdAt)}</div>
         </div>
-        <div class="term-actions">
-          <button class="cmd-btn" onclick="shareLink('${s.id}')" style="font-size:10px">[ SHARE ]</button>
+        <div class="card-acts">
+          <button class="btn" onclick="shareLink('${s.id}')" style="font-size:10px">[ SHARE ]</button>
           ${takeBtn}
         </div>
       </div>
@@ -812,281 +829,260 @@ function renderOpenSurveys() {
   }).join('');
 }
 
+// ============================================================
+// RENDER CLOSED SURVEYS
+// ============================================================
 function renderClosedSurveys() {
-  const el = document.getElementById('closedSurveysList');
-  const closed = state.surveys.filter(s => s.status === 'closed');
-  if (!closed.length) { el.innerHTML = '<div class="empty">no closed surveys — results appear here after closing</div>'; return; }
-  el.innerHTML = closed.map(s => `
-    <div class="term-block">
-      <div class="term-header">
+  const el = document.getElementById('closedList');
+  const closed = S.surveys.filter(s=>s.status==='closed');
+  if (!closed.length) { el.innerHTML='<div class="empty">no closed surveys yet — results appear here after closing</div>'; return; }
+  el.innerHTML = closed.map(s => {
+    const ci = catInfo(s.category);
+    return `<div class="card ${ci.card}">
+      <div class="card-head">
         <div>
-          <div class="term-title">${esc(s.title)}<span class="badge badge-closed">CLOSED</span></div>
-          <div class="term-meta">${s.responses.length} response(s) collected</div>
+          <div class="card-title">${esc(s.title)}<span class="badge ${ci.cls}">${ci.label}</span><span class="badge badge-closed">CLOSED</span></div>
+          <div class="card-meta">${s.responses.length} responses collected</div>
         </div>
-        <div class="term-actions">
-          <button class="cmd-btn" onclick="viewResults('${s.id}')">READ_RESULTS</button>
+        <div class="card-acts">
+          <button class="btn" onclick="viewResults('${s.id}')">VIEW RESULTS</button>
+          <button class="btn primary" onclick="exportCSV('${s.id}')">EXPORT CSV</button>
         </div>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
+// ============================================================
+// RENDER ADMIN SURVEYS
+// ============================================================
 function renderAdminSurveys() {
-  const el = document.getElementById('adminSurveysList');
-  if (!state.surveys.length) { el.innerHTML = '<div class="empty">no surveys — run: new_survey --init</div>'; return; }
-  el.innerHTML = state.surveys.map(s => `
-    <div class="term-block">
-      <div class="term-header">
+  const el = document.getElementById('adminList');
+  if (!S.surveys.length) { el.innerHTML='<div class="empty">no surveys — run: new_survey --init</div>'; return; }
+  el.innerHTML = S.surveys.map(s => {
+    const ci = catInfo(s.category);
+    return `<div class="card ${ci.card}">
+      <div class="card-head">
         <div>
-          <div class="term-title">${esc(s.title)}<span class="badge badge-${s.status}">${s.status.toUpperCase()}</span></div>
-          <div class="term-meta">${s.questions.length} q &nbsp;·&nbsp; ${s.responses.length} resp${s.deadline ? ' &nbsp;·&nbsp; deadline: ' + new Date(s.deadline).toLocaleString() : ''}</div>
+          <div class="card-title">${esc(s.title)}<span class="badge ${ci.cls}">${ci.label}</span><span class="badge badge-${s.status}">${s.status.toUpperCase()}</span></div>
+          <div class="card-meta">${s.questions.length} questions &nbsp;·&nbsp; ${s.responses.length} responses${s.deadline ? ' &nbsp;·&nbsp; deadline: '+new Date(s.deadline).toLocaleString() : ''}</div>
         </div>
-        <div class="term-actions">
-          ${s.status==='draft'  ? '<button class="cmd-btn" onclick="setSurveyStatus(\'' + s.id + '\',\'open\')">▶ OPEN</button>' : ''}
-          ${s.status==='open'   ? '<button class="cmd-btn amber" onclick="setSurveyStatus(\'' + s.id + '\',\'closed\')">■ CLOSE</button>' : ''}
-          ${s.status==='closed' ? '<button class="cmd-btn" onclick="viewResults(\'' + s.id + '\')">RESULTS</button>' : ''}
-          ${s.status!=='closed' ? '<button class="cmd-btn" onclick="editSurvey(\'' + s.id + '\')">EDIT</button>' : ''}
-          <button class="cmd-btn danger" onclick="deleteSurvey('${s.id}')">RM</button>
+        <div class="card-acts">
+          ${s.status==='draft'  ? '<button class="btn" onclick="setStat(\''+s.id+'\',\'open\')">▶ OPEN</button>' : ''}
+          ${s.status==='open'   ? '<button class="btn amber" onclick="setStat(\''+s.id+'\',\'closed\')">■ CLOSE</button>' : ''}
+          ${s.status==='closed' ? '<button class="btn" onclick="viewResults(\''+s.id+'\')">RESULTS</button>' : ''}
+          ${!s.seeded           ? '<button class="btn" onclick="editSurvey(\''+s.id+'\')">EDIT</button>' : ''}
+          ${!s.seeded           ? '<button class="btn danger" onclick="delSurvey(\''+s.id+'\')">RM</button>' : ''}
+          ${s.status==='open'   ? '<button class="btn" onclick="shareLink(\''+s.id+'\')">SHARE</button>' : ''}
         </div>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 // ============================================================
 // CREATE / EDIT SURVEY
 // ============================================================
-function showCreateSurvey(id = null) {
-  state.editingSurveyId = id;
-  const ex = id ? state.surveys.find(s => s.id === id) : null;
-  document.getElementById('createError').classList.remove('show');
-  document.getElementById('surveyTitle').value    = ex ? ex.title : '';
-  document.getElementById('surveyDeadline').value = ex && ex.deadline ? ex.deadline : '';
-  document.getElementById('questionsContainer').innerHTML = '';
+function showCreate(id=null) {
+  S.editId = id;
+  const ex = id ? S.surveys.find(s=>s.id===id) : null;
+  document.getElementById('createErr').classList.remove('show');
+  document.getElementById('svTitle').value   = ex ? ex.title : '';
+  document.getElementById('svPurpose').value = ex ? (ex.purpose||'') : '';
+  document.getElementById('svDeadline').value= ex && ex.deadline ? ex.deadline : '';
+  if (ex) document.getElementById('svCat').value = ex.category || 'tech';
+  document.getElementById('qContainer').innerHTML = '';
   qCount = 0;
-  if (ex) ex.questions.forEach(q => addQuestion(q)); else addQuestion();
+  if (ex) ex.questions.forEach(q=>addQ(q)); else addQ();
   showPage('pageCreate');
 }
-function editSurvey(id) { showCreateSurvey(id); }
+function editSurvey(id) { showCreate(id); }
 
 let qCount = 0;
-function addQuestion(ex = null) {
-  const cur = document.querySelectorAll('.q-block').length;
-  if (cur >= 10) { alert('[ ERR ] Maximum 10 questions.'); return; }
-  const qid = ++qCount;
-  const choices = ex ? ex.choices : ['', ''];
+function addQ(ex=null) {
+  const cur = document.querySelectorAll('.qb').length;
+  if (cur>=10) { toast('[ ERR ] Max 10 questions.'); return; }
+  qCount++;
+  const choices = ex ? ex.choices : ['',''];
   const div = document.createElement('div');
-  div.className = 'q-block'; div.dataset.qid = qid;
-  div.innerHTML = `
-    <div class="q-header">
-      <span class="q-num">Q${cur+1}&gt;</span>
-      <input class="form-input" type="text" placeholder="Enter question text..." value="${ex ? esc(ex.text) : ''}" class="q-text" style="flex:1" />
-      <button class="cmd-btn danger" style="padding:3px 8px;font-size:10px" onclick="removeQuestion(this)">RM</button>
+  div.className='qb';
+  div.innerHTML=`
+    <div class="qh">
+      <span class="qn">Q${cur+1}&gt;</span>
+      <input class="fi qtext" type="text" placeholder="Question text..." style="flex:1" value="${ex?esc(ex.text):''}"/>
+      <button class="btn danger" style="padding:2px 7px;font-size:10px" onclick="removeQ(this)">RM</button>
     </div>
-    <div class="choices-list">${choices.map((c,i) => choiceHTML(i,c)).join('')}</div>
-    <button class="cmd-btn" style="font-size:10px;padding:3px 10px;margin-top:6px" onclick="addChoice(this)">+ CHOICE</button>`;
-  // fix: q-text is inside the header, re-query
-  const inp = div.querySelector('.q-header input');
-  if (ex) inp.value = esc(ex.text);
-  document.getElementById('questionsContainer').appendChild(div);
+    <div class="clist">${choices.map((c,i)=>cHTML(i,c)).join('')}</div>
+    <button class="btn" style="font-size:9px;padding:3px 9px;margin-top:5px" onclick="addC(this)">+ CHOICE</button>`;
+  document.getElementById('qContainer').appendChild(div);
 }
-
-function choiceHTML(i, val='') {
-  return `<div class="choice-row">
-    <input class="form-input c-text" type="text" placeholder="choice_${i+1}" value="${esc(val)}" />
-    <button class="cmd-btn danger" onclick="removeChoice(this)" style="padding:3px 7px;font-size:10px">✕</button>
-  </div>`;
+function cHTML(i,v='') { return `<div class="cr"><input class="fi ct" type="text" placeholder="choice_${i+1}" value="${esc(v)}"/><button class="btn danger" onclick="removeC(this)" style="padding:2px 7px;font-size:10px">✕</button></div>`; }
+function addC(btn) {
+  const l=btn.previousElementSibling;
+  if(l.children.length>=5){toast('[ ERR ] Max 5 choices.');return;}
+  l.insertAdjacentHTML('beforeend',cHTML(l.children.length));
 }
-
-function addChoice(btn) {
-  const list = btn.previousElementSibling;
-  if (list.children.length >= 5) { alert('[ ERR ] Max 5 choices.'); return; }
-  list.insertAdjacentHTML('beforeend', choiceHTML(list.children.length));
+function removeC(btn) {
+  const l=btn.closest('.clist');
+  if(l.children.length<=1){toast('[ ERR ] Min 1 choice.');return;}
+  btn.closest('.cr').remove();
 }
-function removeChoice(btn) {
-  const list = btn.closest('.choices-list');
-  if (list.children.length <= 1) { alert('[ ERR ] Min 1 choice.'); return; }
-  btn.closest('.choice-row').remove();
-}
-function removeQuestion(btn) {
-  if (document.querySelectorAll('.q-block').length <= 1) { alert('[ ERR ] Min 1 question.'); return; }
-  btn.closest('.q-block').remove();
-  document.querySelectorAll('.q-block').forEach((b,i) => {
-    b.querySelector('.q-num').textContent = 'Q'+(i+1)+'>';
-  });
+function removeQ(btn) {
+  if(document.querySelectorAll('.qb').length<=1){toast('[ ERR ] Min 1 question.');return;}
+  btn.closest('.qb').remove();
+  document.querySelectorAll('.qb').forEach((b,i)=>{b.querySelector('.qn').textContent='Q'+(i+1)+'>';});
 }
 
 function saveSurvey() {
-  const errEl = document.getElementById('createError');
-  errEl.classList.remove('show');
-  const title    = document.getElementById('surveyTitle').value.trim();
-  const deadline = document.getElementById('surveyDeadline').value || null;
-  if (!title) { errEl.textContent = 'Survey title required.'; errEl.classList.add('show'); return; }
-
-  const questions = []; let valid = true;
-  document.querySelectorAll('.q-block').forEach((block, qi) => {
-    if (!valid) return;
-    const qText = block.querySelector('.q-header input').value.trim();
-    if (!qText) { errEl.textContent = 'Question '+(qi+1)+' is empty.'; errEl.classList.add('show'); valid=false; return; }
-    const choices = [];
-    block.querySelectorAll('.c-text').forEach(inp => { if (inp.value.trim()) choices.push(inp.value.trim()); });
-    if (choices.length < 2) { errEl.textContent = 'Question '+(qi+1)+' needs min 2 choices.'; errEl.classList.add('show'); valid=false; return; }
-    questions.push({ text: qText, choices });
+  const err=document.getElementById('createErr'); err.classList.remove('show');
+  const title    = document.getElementById('svTitle').value.trim();
+  const category = document.getElementById('svCat').value;
+  const purpose  = document.getElementById('svPurpose').value.trim();
+  const deadline = document.getElementById('svDeadline').value||null;
+  if(!title){err.textContent='Title required.';err.classList.add('show');return;}
+  const questions=[]; let ok=true;
+  document.querySelectorAll('.qb').forEach((b,qi)=>{
+    if(!ok)return;
+    const qt=b.querySelector('.qtext').value.trim();
+    if(!qt){err.textContent='Question '+(qi+1)+' is empty.';err.classList.add('show');ok=false;return;}
+    const cs=[];b.querySelectorAll('.ct').forEach(i=>{if(i.value.trim())cs.push(i.value.trim());});
+    if(cs.length<2){err.textContent='Q'+(qi+1)+' needs min 2 choices.';err.classList.add('show');ok=false;return;}
+    questions.push({text:qt,choices:cs});
   });
-  if (!valid || !questions.length) return;
-
-  if (state.editingSurveyId) {
-    const s = state.surveys.find(x => x.id === state.editingSurveyId);
-    s.title = title; s.questions = questions; s.deadline = deadline;
+  if(!ok||!questions.length)return;
+  if(S.editId){
+    const sv=S.surveys.find(x=>x.id===S.editId);
+    sv.title=title;sv.category=category;sv.purpose=purpose;sv.deadline=deadline;sv.questions=questions;
   } else {
-    state.surveys.push({ id:'sv_'+Date.now(), title, questions, deadline, status:'draft', responses:[], createdAt:new Date().toISOString() });
+    S.surveys.push({id:'sv_'+Date.now(),title,category,purpose,deadline,status:'draft',responses:[],createdAt:new Date().toISOString(),seeded:false});
   }
-  save(); showHome(); switchTab('admin');
+  save();showHome();switchTab('admin');
 }
 
-function setSurveyStatus(id, status) {
-  state.surveys.find(x => x.id === id).status = status;
-  save(); renderHome();
-}
-function deleteSurvey(id) {
-  if (!confirm('[ CONFIRM ] rm -rf survey? This cannot be undone.')) return;
-  state.surveys = state.surveys.filter(x => x.id !== id);
-  save(); renderHome();
+function setStat(id,status) { S.surveys.find(x=>x.id===id).status=status; save();renderHome(); }
+function delSurvey(id) {
+  if(!confirm('[ CONFIRM ] rm -rf survey?'))return;
+  S.surveys=S.surveys.filter(x=>x.id!==id);save();renderHome();
 }
 
 // ============================================================
 // TAKE SURVEY
 // ============================================================
 function startTake(id) {
-  if (state.currentUser) {
-    const u = getUsers().find(x => x.id === state.currentUser.id);
-    if (u && u.completedSurveys && u.completedSurveys.includes(id)) {
-      showToast('[ INFO ] Already completed this survey.');
-      return;
-    }
+  if(S.user){
+    const u=getUsers().find(x=>x.id===S.user.id);
+    if(u&&u.completedSurveys&&u.completedSurveys.includes(id)){toast('[ INFO ] You already responded to this survey.');return;}
   }
-  const s = state.surveys.find(x => x.id === id);
-  document.getElementById('takeSurveyContent').innerHTML = `
-    <div class="section-cmd"><span>$ cat /surveys/open/${s.id}.survey</span></div>
-    <div class="term-block" style="margin-bottom:16px">
-      <div class="term-title">${esc(s.title)}</div>
-      <div class="term-meta">${s.questions.length} questions — select one option per question</div>
+  const s=S.surveys.find(x=>x.id===id);
+  const ci=catInfo(s.category);
+  document.getElementById('takeContent').innerHTML=`
+    <div class="prompt"><span>$ cat /surveys/${s.id}.survey</span></div>
+    <div class="card ${ci.card}" style="margin-bottom:16px">
+      <div class="card-title">${esc(s.title)}<span class="badge ${ci.cls}">${ci.label}</span></div>
+      ${s.purpose?'<div style="font-size:11px;color:var(--text2);margin:6px 0;line-height:1.6">'+esc(s.purpose)+'</div>':''}
+      <div class="card-meta">${s.questions.length} questions — answer all to submit</div>
     </div>
-    <div class="alert alert-error" id="takeError"></div>
-    ${s.questions.map((q,qi) => `
-      <div class="term-block q-take">
-        <div style="font-size:10px;color:var(--green3);letter-spacing:1px;margin-bottom:6px">Q${qi+1} / ${s.questions.length}</div>
+    <div class="alert alert-e" id="takeErr"></div>
+    ${s.questions.map((q,qi)=>`
+      <div class="card qt">
+        <div style="font-size:9px;color:var(--muted);letter-spacing:1px;margin-bottom:5px">Q${qi+1} / ${s.questions.length}</div>
         <h4>${esc(q.text)}</h4>
-        ${q.choices.map((c,ci) => `
-          <label class="radio-label">
-            <input type="radio" name="q${qi}" value="${ci}" />
-            ${esc(c)}
-          </label>`).join('')}
+        ${q.choices.map((c,ci2)=>`<label class="rl"><input type="radio" name="q${qi}" value="${ci2}"/> ${esc(c)}</label>`).join('')}
       </div>`).join('')}
-    <div class="btn-row">
-      <button class="cmd-btn primary" onclick="submitSurvey('${s.id}')">SUBMIT_RESPONSE</button>
-      <button class="cmd-btn" onclick="showHome()">ABORT</button>
+    <div class="br2">
+      <button class="btn primary" onclick="submitSurvey('${s.id}')">SUBMIT RESPONSE</button>
+      <button class="btn" onclick="showHome()">ABORT</button>
     </div>`;
   showPage('pageTake');
 }
 
 function submitSurvey(id) {
-  const s = state.surveys.find(x => x.id === id);
-  const errEl = document.getElementById('takeError');
-  errEl.classList.remove('show');
-  const answers = []; let allOk = true;
-  s.questions.forEach((_,qi) => {
-    const c = document.querySelector('input[name="q'+qi+'"]:checked');
-    if (!c) { allOk=false; return; }
-    answers.push(parseInt(c.value));
+  const s=S.surveys.find(x=>x.id===id);
+  const err=document.getElementById('takeErr'); err.classList.remove('show');
+  const answers=[];let allOk=true;
+  s.questions.forEach((_,qi)=>{
+    const c=document.querySelector('input[name="q'+qi+'"]:checked');
+    if(!c){allOk=false;return;}answers.push(parseInt(c.value));
   });
-  if (!allOk) { errEl.textContent = 'All questions must be answered.'; errEl.classList.add('show'); return; }
-
-  const respondent = state.currentUser ? state.currentUser.name : 'anonymous';
-  s.responses.push({ answers, at: new Date().toISOString(), respondent });
-  save();
-
-  if (state.currentUser) {
-    const users = getUsers();
-    const u = users.find(x => x.id === state.currentUser.id);
-    if (u) { u.completedSurveys = u.completedSurveys||[]; if(!u.completedSurveys.includes(id)) u.completedSurveys.push(id); saveUsers(users); state.currentUser=u; }
+  if(!allOk){err.textContent='All questions must be answered.';err.classList.add('show');return;}
+  const respondent=S.user?S.user.name:'anonymous';
+  s.responses.push({answers,at:new Date().toISOString(),respondent});save();
+  if(S.user){
+    const users=getUsers();const u=users.find(x=>x.id===S.user.id);
+    if(u){u.completedSurveys=u.completedSurveys||[];if(!u.completedSurveys.includes(id))u.completedSurveys.push(id);saveUsers(users);S.user=u;}
   }
-
-  document.getElementById('takeSurveyContent').innerHTML = `
-    <div class="term-block" style="text-align:center;padding:48px 20px">
-      <div style="color:var(--green);font-size:24px;margin-bottom:16px">[ OK ]</div>
+  document.getElementById('takeContent').innerHTML=`
+    <div class="card" style="text-align:center;padding:48px 20px">
+      <div style="color:var(--green);font-size:28px;margin-bottom:12px">[ OK ]</div>
       <div style="font-size:14px;color:var(--green);letter-spacing:2px;margin-bottom:8px">RESPONSE RECORDED</div>
-      <div style="color:var(--text2);font-size:11px;margin-bottom:24px">Thank you${state.currentUser ? ', '+esc(state.currentUser.name) : ''}. Your data has been written to /surveys/responses/</div>
-      <button class="cmd-btn primary" onclick="showHome()">cd ~/home</button>
+      <div style="color:var(--text2);font-size:11px;margin-bottom:6px">Thank you${S.user?', '+esc(S.user.name):' for participating'}.</div>
+      <div style="color:var(--muted);font-size:10px;margin-bottom:24px">Your voice has been added to the data. Results are visible once the survey closes.</div>
+      <div class="br2" style="justify-content:center">
+        <button class="btn primary" onclick="showHome()">cd ~/home</button>
+        <button class="btn" onclick="switchTab('open');showHome()">MORE SURVEYS</button>
+      </div>
     </div>`;
 }
 
 // ============================================================
 // VIEW RESULTS + CHARTS
 // ============================================================
-window._charts = []; window._chartType = 'bar';
+window._charts=[];window._ctype='bar';
 
 function viewResults(id) {
-  const s = state.surveys.find(x => x.id === id);
-  const tallies = s.questions.map(q => new Array(q.choices.length).fill(0));
-  s.responses.forEach(r => { r.answers.forEach((ans,qi) => { tallies[qi][ans]++; }); });
-  const total = s.responses.length;
-  const colors = ['rgba(57,255,20,0.8)','rgba(0,255,204,0.8)','rgba(255,184,0,0.8)','rgba(255,51,51,0.8)','rgba(163,113,247,0.8)'];
+  const s=S.surveys.find(x=>x.id===id);
+  const tallies=s.questions.map(q=>new Array(q.choices.length).fill(0));
+  s.responses.forEach(r=>{r.answers.forEach((a,qi)=>{tallies[qi][a]++;});});
+  const total=s.responses.length;
+  const ci=catInfo(s.category);
+  const colors=['rgba(57,255,20,.8)','rgba(0,255,204,.8)','rgba(255,184,0,.8)','rgba(255,68,68,.8)','rgba(185,102,255,.8)'];
 
-  document.getElementById('resultsContent').innerHTML = `
-    <div class="section-cmd"><span>$ cat /surveys/results/${s.id}.log</span></div>
-    <div class="flex-between" style="margin-bottom:16px;align-items:center">
-      <div>
-        <div class="term-title">${esc(s.title)}</div>
-        <div class="term-meta">${total} total response(s)</div>
-      </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="cmd-btn" id="chartToggleBtn" onclick="toggleChart()" style="font-size:10px">[ PIE_MODE ]</button>
-        <button class="cmd-btn primary" onclick="exportCSV('${s.id}')" style="font-size:10px">EXPORT_CSV</button>
-        <button class="cmd-btn" onclick="showHome()" style="font-size:10px">← BACK</button>
+  document.getElementById('resultsContent').innerHTML=`
+    <div class="prompt"><span>$ cat /surveys/results/${s.id}.log --verbose</span></div>
+    <div class="card ${ci.card}" style="margin-bottom:16px">
+      <div class="fb">
+        <div>
+          <div class="card-title">${esc(s.title)}<span class="badge ${ci.cls}">${ci.label}</span><span class="badge badge-closed">CLOSED</span></div>
+          ${s.purpose?'<div style="font-size:11px;color:var(--text2);margin:5px 0">'+esc(s.purpose)+'</div>':''}
+          <div class="card-meta">${total} response(s) collected</div>
+        </div>
+        <div class="card-acts">
+          <button class="btn" id="ctBtn" onclick="toggleChart()" style="font-size:10px">[ PIE ]</button>
+          <button class="btn primary" onclick="exportCSV('${s.id}')" style="font-size:10px">EXPORT CSV</button>
+          <button class="btn" onclick="showHome()" style="font-size:10px">← BACK</button>
+        </div>
       </div>
     </div>
-    ${s.questions.map((q,qi) => `
-      <div class="term-block">
-        <div style="font-size:10px;color:var(--green3);letter-spacing:1px;margin-bottom:6px">Q${qi+1} / ${s.questions.length}</div>
-        <div class="term-title" style="font-size:12px;margin-bottom:12px">${esc(q.text)}</div>
-        <div class="chart-grid">
+    ${!total ? '<div class="empty">no responses yet</div>' : ''}
+    ${s.questions.map((q,qi)=>`
+      <div class="card">
+        <div style="font-size:9px;color:var(--muted);letter-spacing:1px;margin-bottom:5px">Q${qi+1} / ${s.questions.length}</div>
+        <div style="font-size:12px;font-weight:600;color:var(--green);margin-bottom:12px">${esc(q.text)}</div>
+        <div class="cg">
           <div>
-            <table class="results-table">
-              <thead><tr><th>CHOICE</th><th>VOTES</th><th>PCT</th></tr></thead>
-              <tbody>${q.choices.map((c,ci) => {
-                const v = tallies[qi][ci]; const p = total ? Math.round(v/total*100) : 0;
-                return '<tr><td>'+esc(c)+'</td><td>'+v+'</td><td>'+p+'%</td></tr>';
-              }).join('')}</tbody>
+            <table class="rt">
+              <thead><tr><th>CHOICE</th><th>VOTES</th><th>%</th></tr></thead>
+              <tbody>${q.choices.map((c,ci2)=>{const v=tallies[qi][ci2];const p=total?Math.round(v/total*100):0;return '<tr><td>'+esc(c)+'</td><td>'+v+'</td><td>'+p+'%</td></tr>';}).join('')}</tbody>
             </table>
-            <div style="margin-top:12px">
-              ${q.choices.map((c,ci) => {
-                const v=tallies[qi][ci]; const p=total?Math.round(v/total*100):0;
-                return '<div class="bar-row"><div class="bar-label">'+esc(c)+'</div><div class="bar-track"><div class="bar-fill" style="width:'+p+'%"></div></div><div class="bar-count">'+v+'</div></div>';
-              }).join('')}
+            <div style="margin-top:10px">
+              ${q.choices.map((c,ci2)=>{const v=tallies[qi][ci2];const p=total?Math.round(v/total*100):0;return '<div class="br"><div class="bl2">'+esc(c)+'</div><div class="bt"><div class="bf" style="width:'+p+'%"></div></div><div class="bc">'+v+'</div></div>';}).join('')}
             </div>
           </div>
-          <div class="chart-wrap"><canvas id="chart_${qi}"></canvas></div>
+          <div class="cw"><canvas id="chart_${qi}"></canvas></div>
         </div>
       </div>`).join('')}`;
 
-  window._charts = []; window._chartType = 'bar';
-  s.questions.forEach((q,qi) => {
-    const ctx = document.getElementById('chart_'+qi).getContext('2d');
-    const ch = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: q.choices.map(c => c.length>14 ? c.slice(0,12)+'…' : c),
-        datasets: [{ data: tallies[qi], backgroundColor: colors, borderRadius: 0, borderSkipped: false }]
-      },
-      options: {
-        responsive:true, maintainAspectRatio:false,
-        plugins: {
-          legend: { display:false },
-          tooltip: { callbacks: { label: ctx => ' '+ctx.raw+' ('+( total?Math.round(ctx.raw/total*100):0)+'%)' }, bodyFont:{family:'JetBrains Mono'}, titleFont:{family:'JetBrains Mono'} }
-        },
-        scales: {
-          y: { beginAtZero:true, ticks:{stepSize:1,color:'#3a5c3a',font:{family:'JetBrains Mono',size:10}}, grid:{color:'rgba(30,46,30,0.8)'} },
-          x: { ticks:{color:'#3a5c3a',font:{family:'JetBrains Mono',size:10}}, grid:{display:false} }
-        }
+  window._charts=[];window._ctype='bar';
+  s.questions.forEach((q,qi)=>{
+    const ctx=document.getElementById('chart_'+qi)?.getContext('2d');
+    if(!ctx)return;
+    const ch=new Chart(ctx,{
+      type:'bar',
+      data:{labels:q.choices.map(c=>c.length>16?c.slice(0,14)+'…':c),datasets:[{data:tallies[qi],backgroundColor:colors,borderRadius:0,borderSkipped:false}]},
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+ctx.raw+' ('+(total?Math.round(ctx.raw/total*100):0)+'%)'},bodyFont:{family:'JetBrains Mono'},titleFont:{family:'JetBrains Mono'}}},
+        scales:{y:{beginAtZero:true,ticks:{stepSize:1,color:'#2e4e2e',font:{family:'JetBrains Mono',size:10}},grid:{color:'rgba(26,46,26,.8)'}},x:{ticks:{color:'#2e4e2e',font:{family:'JetBrains Mono',size:10}},grid:{display:false}}}
       }
     });
     window._charts.push(ch);
@@ -1095,15 +1091,12 @@ function viewResults(id) {
 }
 
 function toggleChart() {
-  window._chartType = window._chartType === 'bar' ? 'pie' : 'bar';
-  document.getElementById('chartToggleBtn').textContent = window._chartType==='bar' ? '[ PIE_MODE ]' : '[ BAR_MODE ]';
-  window._charts.forEach(ch => {
-    ch.config.type = window._chartType;
-    ch.options.scales = window._chartType==='pie' ? {} : {
-      y:{beginAtZero:true,ticks:{stepSize:1,color:'#3a5c3a',font:{family:'JetBrains Mono',size:10}},grid:{color:'rgba(30,46,30,0.8)'}},
-      x:{ticks:{color:'#3a5c3a',font:{family:'JetBrains Mono',size:10}},grid:{display:false}}
-    };
-    ch.options.plugins.legend = { display: window._chartType==='pie', labels:{color:'#c8e6c8',font:{family:'JetBrains Mono',size:10},boxWidth:12} };
+  window._ctype=window._ctype==='bar'?'pie':'bar';
+  document.getElementById('ctBtn').textContent=window._ctype==='bar'?'[ PIE ]':'[ BAR ]';
+  window._charts.forEach(ch=>{
+    ch.config.type=window._ctype;
+    ch.options.scales=window._ctype==='pie'?{}:{y:{beginAtZero:true,ticks:{stepSize:1,color:'#2e4e2e',font:{family:'JetBrains Mono',size:10}},grid:{color:'rgba(26,46,26,.8)'}},x:{ticks:{color:'#2e4e2e',font:{family:'JetBrains Mono',size:10}},grid:{display:false}}};
+    ch.options.plugins.legend={display:window._ctype==='pie',labels:{color:'#b8dcb8',font:{family:'JetBrains Mono',size:10},boxWidth:12}};
     ch.update();
   });
 }
@@ -1112,94 +1105,60 @@ function toggleChart() {
 // EXPORT CSV
 // ============================================================
 function exportCSV(id) {
-  const s = state.surveys.find(x => x.id === id);
-  if (!s.responses.length) { showToast('[ WARN ] No responses to export.'); return; }
-  const headers = ['RESPONDENT','SUBMITTED_AT',...s.questions.map((q,i) => 'Q'+(i+1)+':'+q.text)];
-  const rows = s.responses.map(r => [r.respondent||'anonymous', new Date(r.at).toLocaleString(), ...r.answers.map((a,qi) => s.questions[qi].choices[a])]);
-  const csv = [headers,...rows].map(row => row.map(c => '"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
-  a.download = s.title.replace(/\s+/g,'_')+'_results.csv';
-  a.click();
-  showToast('[ OK ] CSV exported');
+  const s=S.surveys.find(x=>x.id===id);
+  if(!s.responses.length){toast('[ WARN ] No responses to export.');return;}
+  const headers=['RESPONDENT','SUBMITTED_AT',...s.questions.map((q,i)=>'Q'+(i+1)+':'+q.text)];
+  const rows=s.responses.map(r=>[r.respondent||'anonymous',new Date(r.at).toLocaleString(),...r.answers.map((a,qi)=>s.questions[qi].choices[a])]);
+  const csv=[headers,...rows].map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download=s.title.replace(/\s+/g,'_')+'_results.csv';a.click();
+  toast('[ OK ] CSV exported — '+s.responses.length+' rows');
 }
 
 // ============================================================
 // DEADLINE AUTO-CLOSE
 // ============================================================
 function checkDeadlines() {
-  const now = new Date(); let changed = false;
-  state.surveys.forEach(s => {
-    if (s.status==='open' && s.deadline && new Date(s.deadline)<=now) { s.status='closed'; changed=true; }
-  });
-  if (changed) save();
+  let changed=false;
+  S.surveys.forEach(s=>{if(s.status==='open'&&s.deadline&&new Date(s.deadline)<=new Date()){s.status='closed';changed=true;}});
+  if(changed)save();
 }
 checkDeadlines();
-setInterval(() => { checkDeadlines(); renderHome(); }, 30000);
+setInterval(()=>{checkDeadlines();updateStats();},30000);
 
 // ============================================================
-// THEME TOGGLE
+// THEME
 // ============================================================
 function toggleTheme() {
-  const light = document.body.classList.toggle('light-mode');
-  document.getElementById('themeToggle').textContent = light ? '[ DARK ]' : '[ THEME ]';
-  localStorage.setItem('wl_theme', light ? 'light' : 'dark');
+  const l=document.body.classList.toggle('lm');
+  document.getElementById('themeBtn').textContent=l?'[ DARK ]':'[ THEME ]';
+  localStorage.setItem('wl_theme_v2',l?'light':'dark');
 }
-(function initTheme() {
-  if (localStorage.getItem('wl_theme')==='light') {
-    document.body.classList.add('light-mode');
-    document.getElementById('themeToggle').textContent = '[ DARK ]';
-  }
-})();
+if(localStorage.getItem('wl_theme_v2')==='light'){document.body.classList.add('lm');document.getElementById('themeBtn').textContent='[ DARK ]';}
 
 // ============================================================
 // SHARE LINK
 // ============================================================
-function shareLink(surveyId) {
-  const url = window.location.href.split('#')[0] + '#survey=' + surveyId;
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(url).then(() => showToast('[ OK ] Link copied to clipboard')).catch(() => prompt('Copy link:', url));
-  } else { prompt('Copy link:', url); }
+function shareLink(id) {
+  const url=location.href.split('#')[0]+'#survey='+id;
+  if(navigator.clipboard){navigator.clipboard.writeText(url).then(()=>toast('[ OK ] Link copied!')).catch(()=>prompt('Copy:',url));}else{prompt('Copy:',url);}
 }
-
-(function checkShareLink() {
-  const hash = window.location.hash;
-  if (hash.startsWith('#survey=')) {
-    const id = hash.replace('#survey=','');
-    const s = state.surveys.find(x => x.id===id);
-    if (s && s.status==='open') setTimeout(() => startTake(id), 800);
+(function checkHash(){
+  const h=location.hash;
+  if(h.startsWith('#survey=')){
+    const id=h.replace('#survey=','');
+    const s=S.surveys.find(x=>x.id===id);
+    if(s&&s.status==='open')setTimeout(()=>startTake(id),800);
   }
 })();
 
 // ============================================================
-// TOAST
-// ============================================================
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.style.opacity = '1';
-  setTimeout(() => { t.style.opacity = '0'; }, 2800);
-}
-
-// ============================================================
 // UTILS
 // ============================================================
-function esc(str) {
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-// ============================================================
-// INIT — called after boot
-// ============================================================
-function renderHome() {
-  checkDeadlines();
-  const tS = document.getElementById('totalSurveys');
-  const tR = document.getElementById('totalResponses');
-  if (tS) tS.textContent = state.surveys.length;
-  if (tR) tR.textContent = state.surveys.reduce((a,s) => a+s.responses.length, 0);
-  renderOpenSurveys();
-  renderClosedSurveys();
-  if (state.isAdmin) renderAdminSurveys();
-}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function timeSince(iso){const s=Math.floor((Date.now()-new Date(iso))/1000);if(s<60)return s+'s ago';if(s<3600)return Math.floor(s/60)+'m ago';if(s<86400)return Math.floor(s/3600)+'h ago';return Math.floor(s/86400)+'d ago';}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.opacity='1';setTimeout(()=>{t.style.opacity='0';},2800);}
 </script>
 </body>
 </html>
